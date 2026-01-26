@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { bubbleSort, selectionSort } from '@/algorithms/sorting';
-import { bfs, dfs } from '@/algorithms/graph';
-import { buildMaxHeap, insertHeap, extractMax } from '@/algorithms/heap';
+import { bubbleSort, selectionSort, insertionSort, mergeSort, quickSort } from '@/algorithms/sorting';
+import { bfs, dfs, dijkstra, aStar } from '@/algorithms/graph';
+import { buildMaxHeap, insertHeap, extractMax, heapSort, decreaseKey, deleteHeap } from '@/algorithms/heap';
 import { Step } from '@/types';
 import Header from '@/components/header';
 import ControlPanel from '@/components/control-panel';
@@ -12,7 +12,7 @@ import InfoPanel from '@/components/info-panel';
 import { Play, Pause, SkipForward, RotateCcw, Zap, Brain, Cpu, Sparkles } from 'lucide-react';
 
 type CategoryType = 'sorting' | 'graph' | 'heap';
-type AlgorithmType = 'bubble' | 'selection' | 'bfs' | 'dfs' | 'buildHeap' | 'insertHeap' | 'extractMax';
+type AlgorithmType = 'bubble' | 'selection' | 'insertion' | 'merge' | 'quick' | 'bfs' | 'dfs' | 'dijkstra' | 'astar' | 'buildHeap' | 'insertHeap' | 'extractMax' | 'heapSort' | 'decreaseKey' | 'deleteHeap';
 
 export default function Home() {
   const [category, setCategory] = useState<CategoryType>('sorting');
@@ -81,6 +81,15 @@ export default function Home() {
           case 'selection':
             newSteps = selectionSort(data);
             break;
+          case 'insertion':
+            newSteps = insertionSort(data);
+            break;
+          case 'merge':
+            newSteps = mergeSort(data);
+            break;
+          case 'quick':
+            newSteps = quickSort(data);
+            break;
           case 'buildHeap':
             newSteps = buildMaxHeap(data);
             break;
@@ -90,12 +99,39 @@ export default function Home() {
           case 'extractMax':
             newSteps = extractMax(data);
             break;
+          case 'heapSort':
+            newSteps = heapSort(data);
+            break;
+          case 'decreaseKey':
+            newSteps = decreaseKey(data.slice(1), data[0], data[1]);
+            break;
+          case 'deleteHeap':
+            newSteps = deleteHeap(data, data[0]);
+            break;
         }
       }
 
       if (category === 'graph') {
-        const adj = parseGraphInput(input);
-        newSteps = algorithm === 'bfs' ? bfs(adj, 0) : dfs(adj, 0);
+        const graphData = parseGraphInput(input);
+        const adj = graphData.adj;
+        const weights = graphData.weights;
+
+        switch (algorithm) {
+          case 'bfs':
+            newSteps = bfs(adj, 0);
+            break;
+          case 'dfs':
+            newSteps = dfs(adj, 0);
+            break;
+          case 'dijkstra':
+            newSteps = dijkstra(adj, weights, 0);
+            break;
+          case 'astar':
+            // Simple heuristic for demo (straight-line distance approximation)
+            const heuristic = Array(adj.length).fill(0).map((_, i) => Math.abs(i - (adj.length - 1)));
+            newSteps = aStar(adj, weights, 0, adj.length - 1, heuristic);
+            break;
+        }
       }
 
       setSteps(newSteps);
@@ -109,13 +145,29 @@ export default function Home() {
   };
 
   /* Utils */
-  const parseGraphInput = (input: string): number[][] => {
+  const parseGraphInput = (input: string): { adj: number[][], weights: number[][] } => {
     const adj: number[][] = [];
-    input.split(';').forEach((line) => {
-      const [node, neighbors] = line.split(':');
-      adj[+node] = neighbors ? neighbors.split(',').map(Number) : [];
+    const weights: number[][] = [];
+    const lines = input.split(';');
+
+    lines.forEach((line) => {
+      const [nodeStr, neighborsStr] = line.split(':');
+      const node = +nodeStr;
+
+      if (!adj[node]) adj[node] = [];
+      if (!weights[node]) weights[node] = [];
+
+      if (neighborsStr) {
+        const neighbors = neighborsStr.split(',');
+        neighbors.forEach((neighborStr) => {
+          const [neighbor, weight = 1] = neighborStr.split('-').map(Number);
+          adj[node].push(neighbor);
+          weights[node][neighbor] = weight;
+        });
+      }
     });
-    return adj;
+
+    return { adj, weights };
   };
 
   const generateRandomInput = () => {

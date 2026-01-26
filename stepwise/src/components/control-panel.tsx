@@ -38,15 +38,23 @@ export default function ControlPanel({
       sorting: [
         { value: 'bubble', label: 'Bubble Sort' },
         { value: 'selection', label: 'Selection Sort' },
+        { value: 'insertion', label: 'Insertion Sort' },
+        { value: 'merge', label: 'Merge Sort' },
+        { value: 'quick', label: 'Quick Sort' },
       ],
       graph: [
         { value: 'bfs', label: 'BFS' },
         { value: 'dfs', label: 'DFS' },
+        { value: 'dijkstra', label: 'Dijkstra' },
+        { value: 'astar', label: 'A* Search' },
       ],
       heap: [
         { value: 'buildHeap', label: 'Build Heap' },
         { value: 'insertHeap', label: 'Insert' },
         { value: 'extractMax', label: 'Extract Max' },
+        { value: 'heapSort', label: 'Heap Sort' },
+        { value: 'decreaseKey', label: 'Decrease Key' },
+        { value: 'deleteHeap', label: 'Delete' },
       ],
     };
     return options[category] || [];

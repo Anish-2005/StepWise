@@ -70,3 +70,72 @@ export function extractMax(arr: number[]): HeapStep[] {
   heapify(array, array.length, 0, steps);
   return steps;
 }
+
+export function heapSort(arr: number[]): HeapStep[] {
+  const steps: HeapStep[] = [];
+  const array = [...arr];
+  const n = array.length;
+
+  // Build max heap
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+    heapify(array, n, i, steps);
+  }
+
+  // Extract elements one by one
+  for (let i = n - 1; i > 0; i--) {
+    // Move current root to end
+    [array[0], array[i]] = [array[i], array[0]];
+    steps.push({ type: 'swap', indices: [0, i], arrayState: [...array] });
+
+    // Call heapify on reduced heap
+    heapify(array, i, 0, steps);
+  }
+
+  steps.push({ type: 'heapify', indices: [], arrayState: [...array] });
+  return steps;
+}
+
+export function decreaseKey(arr: number[], index: number, newVal: number): HeapStep[] {
+  const steps: HeapStep[] = [];
+  const array = [...arr];
+
+  if (index >= array.length || newVal > array[index]) {
+    return steps; // Invalid operation
+  }
+
+  array[index] = newVal;
+  steps.push({ type: 'swap', indices: [index], arrayState: [...array] });
+
+  let i = index;
+  while (i > 0) {
+    const parent = Math.floor((i - 1) / 2);
+    steps.push({ type: 'compare', indices: [i, parent], arrayState: [...array] });
+
+    if (array[i] > array[parent]) {
+      [array[i], array[parent]] = [array[parent], array[i]];
+      steps.push({ type: 'swap', indices: [i, parent], arrayState: [...array] });
+      i = parent;
+    } else {
+      break;
+    }
+  }
+
+  return steps;
+}
+
+export function deleteHeap(arr: number[], index: number): HeapStep[] {
+  const steps: HeapStep[] = [];
+  const array = [...arr];
+
+  if (index >= array.length) return steps;
+
+  // Replace with last element and remove
+  array[index] = array[array.length - 1];
+  array.pop();
+  steps.push({ type: 'swap', indices: [index], arrayState: [...array] });
+
+  // Heapify from the modified index
+  heapify(array, array.length, index, steps);
+
+  return steps;
+}
