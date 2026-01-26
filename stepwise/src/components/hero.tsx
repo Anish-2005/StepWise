@@ -1,6 +1,7 @@
 'use client';
 
 import { Zap, Brain, Cpu, ArrowRight, Play, BarChart3, ChevronRight } from 'lucide-react';
+import Logo from './logo';
 
 interface HeroProps {
   onGetStarted?: () => void;
@@ -21,6 +22,9 @@ export default function Hero({ onGetStarted }: HeroProps) {
 
           {/* ================= LEFT: THOUGHT PROCESS ================= */}
           <div className="flex flex-col items-start text-left space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+
+            {/* Logo */}
+            <Logo size="lg" className="mb-2" />
 
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-sm font-medium transition-colors hover:bg-blue-100 cursor-default">

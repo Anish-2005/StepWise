@@ -2,6 +2,7 @@
 
 import { Zap, Menu, X, Github, Cpu } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import Logo from './logo';
 
 interface HeaderProps {
   className?: string;
@@ -37,13 +38,7 @@ export default function Header({ className = '' }: HeaderProps) {
             className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-md"
             aria-label="StepWise Home"
           >
-            <div className="relative">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-md group-hover:shadow-blue-500/30 transition">
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              <div className="absolute inset-0 rounded-lg bg-blue-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-
+            <Logo size="sm" showText={false} />
             <div className="leading-tight">
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold text-white tracking-tight">
