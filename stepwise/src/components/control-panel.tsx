@@ -55,7 +55,7 @@ return (
   <div className="sticky top-24 space-y-6">
 
     {/* ================= CATEGORY ================= */}
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(99,102,241,0.15)]">
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400" />
@@ -78,7 +78,7 @@ return (
               className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
                 ${
                   active
-                    ? 'bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-[0_0_25px_rgba(99,102,241,0.5)]'
+                    ? 'bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg'
                     : 'bg-white/5 text-slate-300 hover:bg-white/10'
                 }
               `}
@@ -91,7 +91,7 @@ return (
     </div>
 
     {/* ================= ALGORITHM ================= */}
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(56,189,248,0.15)]">
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" />
@@ -114,7 +114,7 @@ return (
               className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
                 ${
                   active
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_0_25px_rgba(16,185,129,0.5)]'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
                     : 'bg-white/5 text-slate-300 hover:bg-white/10'
                 }
               `}
@@ -127,7 +127,7 @@ return (
     </div>
 
     {/* ================= INPUT ================= */}
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(99,102,241,0.15)]">
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400" />
@@ -154,8 +154,8 @@ return (
           onClick={onGenerate}
           disabled={isLoading}
           className="h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500
-          text-white font-semibold shadow-[0_0_25px_rgba(99,102,241,0.45)]
-          hover:shadow-[0_0_35px_rgba(99,102,241,0.6)]
+          text-white font-semibold shadow-lg
+          hover:shadow-xl
           transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Generating…' : 'Generate'}
@@ -174,7 +174,7 @@ return (
     </div>
 
     {/* ================= LEGEND ================= */}
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(16,185,129,0.15)]">
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
       <div className="flex items-center gap-3 mb-4">
         <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400" />
         <h3 className="font-semibold tracking-wide text-slate-100 text-sm">

@@ -1,5 +1,6 @@
 'use client';
 
+import { Sparkles } from 'lucide-react';
 import { Step } from '@/types';
 
 interface VisualizerProps {
@@ -20,7 +21,7 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
         </div>
 
         <div className="relative z-10 text-center space-y-4">
-          <div className="text-5xl">✨</div>
+          <Sparkles className="w-16 h-16 mx-auto text-indigo-400" />
           <p className="text-slate-300 text-sm tracking-wide">
             Generate an algorithm to begin execution
           </p>
