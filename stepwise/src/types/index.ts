@@ -1,21 +1,29 @@
-export interface SortStep {
-  type: 'compare' | 'swap' | 'sorted';
-  indices: number[];
-  snapshot: number[];
+export interface Step {
+  type: "compare" | "swap" | "visit" | "push" | "pop" | "done";
+  indices?: number[];
+  nodes?: string[];
+  arrayState?: number[];
+  extra?: any;
 }
 
-export interface GraphStep {
-  type: 'visit' | 'enqueue' | 'dequeue' | 'push' | 'pop';
-  node: number;
-  queue?: number[];
-  stack?: number[];
-  visited: boolean[];
-  current: number;
+export interface SortStep extends Step {
+  type: "compare" | "swap" | "done";
+  indices: number[];
+  arrayState: number[];
 }
 
-export interface HeapStep {
-  type: 'compare' | 'swap' | 'heapify' | 'insert' | 'extract';
+export interface GraphStep extends Step {
+  type: "visit" | "enqueue" | "dequeue" | "push" | "pop";
+  nodes: string[];
+  extra: {
+    visited: boolean[];
+    queue?: number[];
+    stack?: number[];
+  };
+}
+
+export interface HeapStep extends Step {
+  type: "compare" | "swap" | "heapify";
   indices: number[];
-  snapshot: number[];
-  heapArray: number[];
+  arrayState: number[];
 }

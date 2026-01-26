@@ -7,17 +7,17 @@ export function bfs(adj: number[][], start: number): GraphStep[] {
 
   visited[start] = true;
   queue.push(start);
-  steps.push({ type: 'visit', node: start, queue: [...queue], visited: [...visited], current: start });
+  steps.push({ type: 'visit', nodes: [start.toString()], extra: { visited: [...visited], queue: [...queue] } });
 
   while (queue.length > 0) {
     const node = queue.shift()!;
-    steps.push({ type: 'dequeue', node, queue: [...queue], visited: [...visited], current: node });
+    steps.push({ type: 'dequeue', nodes: [node.toString()], extra: { visited: [...visited], queue: [...queue] } });
 
     for (const neighbor of adj[node]) {
       if (!visited[neighbor]) {
         visited[neighbor] = true;
         queue.push(neighbor);
-        steps.push({ type: 'enqueue', node: neighbor, queue: [...queue], visited: [...visited], current: node });
+        steps.push({ type: 'enqueue', nodes: [neighbor.toString()], extra: { visited: [...visited], queue: [...queue] } });
       }
     }
   }
@@ -32,17 +32,17 @@ export function dfs(adj: number[][], start: number): GraphStep[] {
 
   visited[start] = true;
   stack.push(start);
-  steps.push({ type: 'visit', node: start, stack: [...stack], visited: [...visited], current: start });
+  steps.push({ type: 'visit', nodes: [start.toString()], extra: { visited: [...visited], stack: [...stack] } });
 
   while (stack.length > 0) {
     const node = stack.pop()!;
-    steps.push({ type: 'pop', node, stack: [...stack], visited: [...visited], current: node });
+    steps.push({ type: 'pop', nodes: [node.toString()], extra: { visited: [...visited], stack: [...stack] } });
 
     for (const neighbor of adj[node]) {
       if (!visited[neighbor]) {
         visited[neighbor] = true;
         stack.push(neighbor);
-        steps.push({ type: 'push', node: neighbor, stack: [...stack], visited: [...visited], current: node });
+        steps.push({ type: 'push', nodes: [neighbor.toString()], extra: { visited: [...visited], stack: [...stack] } });
       }
     }
   }

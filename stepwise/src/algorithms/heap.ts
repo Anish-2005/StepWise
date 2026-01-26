@@ -6,14 +6,14 @@ function heapify(arr: number[], n: number, i: number, steps: HeapStep[]) {
   const right = 2 * i + 2;
 
   if (left < n) {
-    steps.push({ type: 'compare', indices: [largest, left], snapshot: [...arr], heapArray: [...arr] });
+    steps.push({ type: 'compare', indices: [largest, left], arrayState: [...arr] });
     if (arr[left] > arr[largest]) {
       largest = left;
     }
   }
 
   if (right < n) {
-    steps.push({ type: 'compare', indices: [largest, right], snapshot: [...arr], heapArray: [...arr] });
+    steps.push({ type: 'compare', indices: [largest, right], arrayState: [...arr] });
     if (arr[right] > arr[largest]) {
       largest = right;
     }
@@ -21,7 +21,7 @@ function heapify(arr: number[], n: number, i: number, steps: HeapStep[]) {
 
   if (largest !== i) {
     [arr[i], arr[largest]] = [arr[largest], arr[i]];
-    steps.push({ type: 'swap', indices: [i, largest], snapshot: [...arr], heapArray: [...arr] });
+    steps.push({ type: 'swap', indices: [i, largest], arrayState: [...arr] });
     heapify(arr, n, largest, steps);
   }
 }
@@ -34,7 +34,7 @@ export function buildMaxHeap(arr: number[]): HeapStep[] {
   for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
     heapify(array, n, i, steps);
   }
-  steps.push({ type: 'heapify', indices: [], snapshot: [...array], heapArray: [...array] });
+  steps.push({ type: 'heapify', indices: [], arrayState: [...array] });
   return steps;
 }
 
@@ -46,10 +46,10 @@ export function insertHeap(arr: number[], val: number): HeapStep[] {
 
   while (i > 0) {
     const parent = Math.floor((i - 1) / 2);
-    steps.push({ type: 'compare', indices: [i, parent], snapshot: [...array], heapArray: [...array] });
+    steps.push({ type: 'compare', indices: [i, parent], arrayState: [...array] });
     if (array[i] > array[parent]) {
       [array[i], array[parent]] = [array[parent], array[i]];
-      steps.push({ type: 'swap', indices: [i, parent], snapshot: [...array], heapArray: [...array] });
+      steps.push({ type: 'swap', indices: [i, parent], arrayState: [...array] });
       i = parent;
     } else {
       break;
@@ -66,7 +66,7 @@ export function extractMax(arr: number[]): HeapStep[] {
   const max = array[0];
   array[0] = array[array.length - 1];
   array.pop();
-  steps.push({ type: 'extract', indices: [0], snapshot: [...array], heapArray: [...array] });
+  steps.push({ type: 'swap', indices: [0], arrayState: [...array] });
   heapify(array, array.length, 0, steps);
   return steps;
 }

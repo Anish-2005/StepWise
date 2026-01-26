@@ -4,25 +4,41 @@ import { useState, useEffect } from 'react';
 import { bubbleSort, selectionSort } from '../algorithms/sorting';
 import { bfs, dfs } from '../algorithms/graph';
 import { buildMaxHeap, insertHeap, extractMax } from '../algorithms/heap';
-import { SortStep, GraphStep, HeapStep } from '../types';
+import { Step } from '../types';
 
-type AlgorithmType = 'bubble' | 'selection' | 'bfs' | 'dfs' | 'buildHeap' | 'insertHeap' | 'extractMax';
+type CategoryType = 'sorting' | 'graph' | 'heap';
 
 export default function Home() {
+  const [category, setCategory] = useState<CategoryType>('sorting');
   const [algorithm, setAlgorithm] = useState<AlgorithmType>('bubble');
   const [input, setInput] = useState('64,34,25,12,22,11,90');
-  const [steps, setSteps] = useState<(SortStep | GraphStep | HeapStep)[]>([]);
+  const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(500);
+  const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
-    generateSteps();
-  }, [algorithm, input]);
+    // Reset algorithm when category changes
+    switch (category) {
+      case 'sorting':
+        setAlgorithm('bubble');
+        setInput('64,34,25,12,22,11,90');
+        break;
+      case 'graph':
+        setAlgorithm('bfs');
+        setInput('0:1,2;1:0,2;2:0,1');
+        break;
+      case 'heap':
+        setAlgorithm('buildHeap');
+        setInput('64,34,25,12,22,11,90');
+        break;
+    }
+  }, [category]);
 
   const generateSteps = () => {
     const data = input.split(',').map(Number);
-    let newSteps: (SortStep | GraphStep | HeapStep)[] = [];
+    let newSteps: Step[] = [];
     switch (algorithm) {
       case 'bubble':
         newSteps = bubbleSort(data);
@@ -82,21 +98,113 @@ export default function Home() {
     }
   };
 
-  const reset = () => {
-    setCurrentStep(0);
-    setIsPlaying(false);
+  const generateRandomInput = () => {
+    if (category === 'sorting' || category === 'heap') {
+      const arr = Array.from({ length: 10 }, () => Math.floor(Math.random() * 100));
+      setInput(arr.join(','));
+    } else if (category === 'graph') {
+      // Simple random graph with 5 nodes
+      const adj: number[][] = Array.from({ length: 5 }, () => []);
+      for (let i = 0; i < 5; i++) {
+        for (let j = i + 1; j < 5; j++) {
+          if (Math.random() > 0.5) {
+            adj[i].push(j);
+            adj[j].push(i);
+          }
+        }
+      }
+      const inputStr = adj.map((neighbors, i) => `${i}:${neighbors.join(',')}`).join(';');
+      setInput(inputStr);
+    }
   };
 
-  useEffect(() => {
-    if (isPlaying && currentStep < steps.length - 1) {
-      const timer = setTimeout(() => {
-        setCurrentStep(currentStep + 1);
-      }, speed);
-      return () => clearTimeout(timer);
-    } else {
-      setIsPlaying(false);
+  const getPseudocode = () => {
+    switch (algorithm) {
+      case 'bubble':
+        return [
+          'for i in 0 to n-1:',
+          '  for j in 0 to n-i-1:',
+          '    if arr[j] > arr[j+1]:',
+          '      swap arr[j] and arr[j+1]'
+        ];
+      case 'selection':
+        return [
+          'for i in 0 to n-1:',
+          '  minIdx = i',
+          '  for j in i+1 to n:',
+          '    if arr[j] < arr[minIdx]:',
+          '      minIdx = j',
+          '  if minIdx != i:',
+          '    swap arr[i] and arr[minIdx]'
+        ];
+      case 'bfs':
+        return [
+          'queue = [start]',
+          'visited[start] = true',
+          'while queue is not empty:',
+          '  node = dequeue()',
+          '  for neighbor in adj[node]:',
+          '    if not visited[neighbor]:',
+          '      visited[neighbor] = true',
+          '      enqueue(neighbor)'
+        ];
+      case 'dfs':
+        return [
+          'stack = [start]',
+          'visited[start] = true',
+          'while stack is not empty:',
+          '  node = pop()',
+          '  for neighbor in adj[node]:',
+          '    if not visited[neighbor]:',
+          '      visited[neighbor] = true',
+          '      push(neighbor)'
+        ];
+      case 'buildHeap':
+        return [
+          'for i in floor(n/2)-1 downto 0:',
+          '  heapify(arr, n, i)'
+        ];
+      case 'insertHeap':
+        return [
+          'arr.append(val)',
+          'i = len(arr) - 1',
+          'while i > 0:',
+          '  parent = (i-1)//2',
+          '  if arr[i] > arr[parent]:',
+          '    swap arr[i] and arr[parent]',
+          '    i = parent',
+          '  else:',
+          '    break'
+        ];
+      case 'extractMax':
+        return [
+          'max = arr[0]',
+          'arr[0] = arr.pop()',
+          'heapify(arr, len(arr), 0)',
+          'return max'
+        ];
+      default:
+        return [];
     }
-  }, [isPlaying, currentStep, steps, speed]);
+  };
+
+  const getComplexity = () => {
+    switch (algorithm) {
+      case 'bubble':
+      case 'selection':
+        return { time: 'O(n²)', space: 'O(1)' };
+      case 'bfs':
+      case 'dfs':
+        return { time: 'O(V + E)', space: 'O(V)' };
+      case 'buildHeap':
+        return { time: 'O(n)', space: 'O(1)' };
+      case 'insertHeap':
+      case 'extractMax':
+        return { time: 'O(log n)', space: 'O(1)' };
+      default:
+        return { time: 'N/A', space: 'N/A' };
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
@@ -105,19 +213,42 @@ export default function Home() {
         <h1 className="text-2xl font-bold">StepWise</h1>
         <div className="flex space-x-4">
           <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value as CategoryType)}
+            className="bg-gray-700 text-white p-2 rounded"
+          >
+            <option value="sorting">Sorting</option>
+            <option value="graph">Graphs</option>
+            <option value="heap">Heaps</option>
+          </select>
+          <select
             value={algorithm}
             onChange={(e) => setAlgorithm(e.target.value as AlgorithmType)}
             className="bg-gray-700 text-white p-2 rounded"
           >
-            <option value="bubble">Bubble Sort</option>
-            <option value="selection">Selection Sort</option>
-            <option value="bfs">BFS</option>
-            <option value="dfs">DFS</option>
-            <option value="buildHeap">Build Max Heap</option>
-            <option value="insertHeap">Insert Heap</option>
-            <option value="extractMax">Extract Max</option>
+            {category === 'sorting' && (
+              <>
+                <option value="bubble">Bubble Sort</option>
+                <option value="selection">Selection Sort</option>
+              </>
+            )}
+            {category === 'graph' && (
+              <>
+                <option value="bfs">BFS</option>
+                <option value="dfs">DFS</option>
+              </>
+            )}
+            {category === 'heap' && (
+              <>
+                <option value="buildHeap">Build Max Heap</option>
+                <option value="insertHeap">Insert Heap</option>
+                <option value="extractMax">Extract Max</option>
+              </>
+            )}
           </select>
-          <button className="bg-blue-600 p-2 rounded">Toggle Theme</button>
+          <button onClick={() => setDarkMode(!darkMode)} className="bg-blue-600 p-2 rounded">
+            {darkMode ? 'Light' : 'Dark'}
+          </button>
         </div>
       </nav>
 
@@ -127,12 +258,15 @@ export default function Home() {
           <h2 className="text-xl mb-4">Controls</h2>
           <div className="mb-4">
             <label className="block mb-2">Input:</label>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="w-full bg-gray-700 text-white p-2 rounded"
-            />
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                className="flex-1 bg-gray-700 text-white p-2 rounded"
+              />
+              <button onClick={generateRandomInput} className="bg-purple-600 p-2 rounded">Random</button>
+            </div>
           </div>
           <div className="flex space-x-2 mb-4">
             <button onClick={play} className="bg-green-600 p-2 rounded">Play</button>
@@ -185,20 +319,20 @@ export default function Home() {
   );
 }
 
-function VisualizationCanvas({ steps, currentStep, algorithm }: { steps: (SortStep | GraphStep | HeapStep)[], currentStep: number, algorithm: AlgorithmType }) {
+function VisualizationCanvas({ steps, currentStep, algorithm }: { steps: Step[], currentStep: number, algorithm: AlgorithmType }) {
   const step = steps[currentStep];
 
   if (!step) return <div>No steps</div>;
 
-  if ('snapshot' in step) {
+  if (step.arrayState) {
     // Sorting or Heap
     return (
       <div className="flex items-end justify-center space-x-1">
-        {step.snapshot.map((val, idx) => {
+        {step.arrayState.map((val, idx) => {
           let color = 'bg-blue-500';
-          if (step.type === 'compare' && step.indices.includes(idx)) color = 'bg-yellow-500';
-          if (step.type === 'swap' && step.indices.includes(idx)) color = 'bg-red-500';
-          if (step.type === 'sorted' && step.indices.includes(idx)) color = 'bg-green-500';
+          if (step.type === 'compare' && step.indices?.includes(idx)) color = 'bg-yellow-500';
+          if (step.type === 'swap' && step.indices?.includes(idx)) color = 'bg-red-500';
+          if (step.type === 'done' && step.indices?.includes(idx)) color = 'bg-green-500';
           return (
             <div
               key={idx}
@@ -214,24 +348,23 @@ function VisualizationCanvas({ steps, currentStep, algorithm }: { steps: (SortSt
   }
 
   // Graph
-  if ('visited' in step) {
-    const graphStep = step as GraphStep;
+  if (step.extra && step.extra.visited) {
     return (
       <div className="text-center">
         <h3 className="text-lg mb-4">Graph Traversal</h3>
         <div className="mb-4">
-          <p>Current Node: {graphStep.current}</p>
-          <p>Visited: {graphStep.visited.map((v, i) => v ? i : '').filter(Boolean).join(', ')}</p>
-          {graphStep.queue && <p>Queue: {graphStep.queue.join(', ')}</p>}
-          {graphStep.stack && <p>Stack: {graphStep.stack.join(', ')}</p>}
+          <p>Current Node: {step.nodes?.[0]}</p>
+          <p>Visited: {step.extra.visited.map((v, i) => v ? i : '').filter(Boolean).join(', ')}</p>
+          {step.extra.queue && <p>Queue: {step.extra.queue.join(', ')}</p>}
+          {step.extra.stack && <p>Stack: {step.extra.stack.join(', ')}</p>}
         </div>
         {/* Simple node representation */}
         <div className="flex justify-center space-x-4">
-          {graphStep.visited.map((visited, i) => (
+          {step.extra.visited.map((visited, i) => (
             <div
               key={i}
               className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${
-                i === graphStep.current ? 'bg-red-500' : visited ? 'bg-green-500' : 'bg-blue-500'
+                step.nodes?.[0] === i.toString() ? 'bg-red-500' : visited ? 'bg-green-500' : 'bg-blue-500'
               }`}
             >
               {i}
