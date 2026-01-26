@@ -14,7 +14,7 @@ const getStepTypeLabel = (type: string): string => {
   const labels: Record<string, string> = {
     compare: 'Comparing',
     swap: 'Swapping',
-    sorted: 'Sorted',
+    done: 'Sorted',
     visiting: 'Visiting',
     visited: 'Visited',
   };
@@ -25,7 +25,7 @@ const getStepTypeColor = (type: string): string => {
   const colors: Record<string, string> = {
     compare: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50',
     swap: 'bg-red-500/20 text-red-300 border-red-500/50',
-    sorted: 'bg-green-500/20 text-green-300 border-green-500/50',
+    done: 'bg-green-500/20 text-green-300 border-green-500/50',
     visiting: 'bg-violet-500/20 text-violet-300 border-violet-500/50',
     visited: 'bg-green-500/20 text-green-300 border-green-500/50',
   };

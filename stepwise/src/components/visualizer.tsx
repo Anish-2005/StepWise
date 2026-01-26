@@ -38,7 +38,7 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
                 colorClass = 'bg-yellow-500';
               } else if (step.type === 'swap') {
                 colorClass = 'bg-red-500';
-              } else if (step.type === 'sorted') {
+              } else if (step.type === 'done') {
                 colorClass = 'bg-green-500';
               } else {
                 colorClass = 'bg-violet-500';
