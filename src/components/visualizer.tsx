@@ -837,10 +837,10 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
             )}
 
             {/* Draw nodes */}
-            {step.extra!.visited.map((visited: boolean, idx: number) => {
+            {extra.visited.map((visited: boolean, idx: number) => {
               const pos = getBFSNodePosition(idx);
               const isCurrent = step.nodes?.[0] === String(idx);
-              const isInQueue = step.extra!.queue?.includes(idx);
+              const isInQueue = extra.queue?.includes(idx);
 
               let nodeStyle = 'fill-slate-300 stroke-slate-400';
               let scale = 1;
@@ -873,11 +873,11 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
           </svg>
 
           {/* BFS Queue visualization */}
-          {step.extra!.queue && step.extra!.queue.length > 0 && (
+          {extra.queue && extra.queue.length > 0 && (
             <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200 shadow-sm">
               <div className="text-xs font-semibold text-slate-700 mb-1">QUEUE</div>
               <div className="flex gap-1">
-                {step.extra!.queue.map((nodeIdx: number, queueIdx: number) => (
+                {extra.queue.map((nodeIdx: number, queueIdx: number) => (
                   <div
                     key={nodeIdx}
                     className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${
@@ -1373,7 +1373,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               const isInOpenSet = extra.openSet?.includes(idx);
               const distance = extra.distances?.[idx];
               const gScore = extra.gScore?.[idx];
-              const fScore = step.extra?.fScore?.[idx];
+              const fScore = extra.fScore?.[idx];
 
               let nodeStyle = 'fill-blue-300 stroke-blue-400';
               let scale = 1;
