@@ -11,6 +11,7 @@ interface ControlPanelProps {
   setInput: (input: string) => void;
   onGenerate: () => void;
   onRandom: () => void;
+  isLoading?: boolean;
 }
 
 export default function ControlPanel({
@@ -22,6 +23,7 @@ export default function ControlPanel({
   setInput,
   onGenerate,
   onRandom,
+  isLoading = false,
 }: ControlPanelProps) {
   const getCategoryOptions = () => {
     return [
@@ -116,10 +118,18 @@ export default function ControlPanel({
         />
 
         <div className="grid grid-cols-2 gap-2">
-          <button onClick={onGenerate} className="algo-button-primary w-full">
-            Generate
+          <button
+            onClick={onGenerate}
+            disabled={isLoading}
+            className="algo-button-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Generating...' : 'Generate'}
           </button>
-          <button onClick={onRandom} className="algo-button-secondary w-full">
+          <button
+            onClick={onRandom}
+            disabled={isLoading}
+            className="algo-button-secondary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Shuffle className="w-4 h-4 inline mr-1" />
             Random
           </button>

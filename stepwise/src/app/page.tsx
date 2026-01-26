@@ -9,7 +9,7 @@ import Header from '@/components/header';
 import ControlPanel from '@/components/control-panel';
 import Visualizer from '@/components/visualizer';
 import InfoPanel from '@/components/info-panel';
-import { Play, Pause, SkipForward, RotateCcw } from 'lucide-react';
+import { Play, Pause, SkipForward, RotateCcw, Zap, Brain, Cpu, Sparkles } from 'lucide-react';
 
 type CategoryType = 'sorting' | 'graph' | 'heap';
 type AlgorithmType = 'bubble' | 'selection' | 'bfs' | 'dfs' | 'buildHeap' | 'insertHeap' | 'extractMax';
@@ -18,17 +18,18 @@ export default function Home() {
   const [category, setCategory] = useState<CategoryType>('sorting');
   const [algorithm, setAlgorithm] = useState<AlgorithmType>('bubble');
   const [input, setInput] = useState('64,34,25,12,22,11,90');
-
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(500);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   /* Reset on category change */
   useEffect(() => {
     setSteps([]);
     setCurrentStep(0);
     setIsPlaying(false);
+    setIsGenerating(false);
 
     if (category === 'sorting') {
       setAlgorithm('bubble');
@@ -46,7 +47,12 @@ export default function Home() {
 
   /* Auto play engine */
   useEffect(() => {
-    if (!isPlaying || currentStep >= steps.length - 1) return;
+    if (!isPlaying || currentStep >= steps.length - 1) {
+      if (isPlaying && currentStep >= steps.length - 1) {
+        setIsPlaying(false);
+      }
+      return;
+    }
 
     const timer = setTimeout(() => {
       setCurrentStep((prev) => prev + 1);
@@ -56,13 +62,17 @@ export default function Home() {
   }, [isPlaying, currentStep, speed, steps]);
 
   /* Generate steps */
-  const generateSteps = () => {
+  const generateSteps = async () => {
     try {
+      setIsGenerating(true);
       let newSteps: Step[] = [];
 
       if (category === 'sorting' || category === 'heap') {
         const data = input.split(',').map(Number);
         if (data.some(isNaN)) throw new Error('Invalid numbers');
+
+        // Simulate processing time
+        await new Promise(resolve => setTimeout(resolve, 300));
 
         switch (algorithm) {
           case 'bubble':
@@ -93,6 +103,8 @@ export default function Home() {
       setIsPlaying(false);
     } catch (err: any) {
       alert(err.message);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -126,151 +138,234 @@ export default function Home() {
     }
   };
 
-  const getAlgorithmDescription = () => {
-    const descriptions: Record<AlgorithmType, string> = {
-      bubble: 'Bubble Sort repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.',
-      selection: 'Selection Sort divides the list into a sorted and unsorted portion, finding the minimum element each iteration.',
-      bfs: 'Breadth-First Search explores vertices in layers, visiting all neighbors before moving to the next level.',
-      dfs: 'Depth-First Search explores as far as possible along each branch before backtracking.',
-      buildHeap: 'Build Max Heap transforms an array into a max heap structure where each parent is larger than children.',
-      insertHeap: 'Insert into Heap adds a new element while maintaining the max heap property.',
-      extractMax: 'Extract Max removes the maximum element from the heap while maintaining its structure.',
-    };
-    return descriptions[algorithm];
+  const getCategoryIcon = (cat: CategoryType) => {
+    switch (cat) {
+      case 'sorting': return Sparkles;
+      case 'graph': return Brain;
+      case 'heap': return Cpu;
+      default: return Zap;
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10">
-      <Header />
+ return (
+  <div className="relative min-h-screen overflow-hidden bg-[#0B0F1A] text-slate-100">
+    {/* Ambient Background Glows */}
+    <div className="pointer-events-none absolute inset-0">
+      <div className="absolute -top-40 -left-40 w-[700px] h-[700px] bg-indigo-500/20 rounded-full blur-[140px]" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-cyan-500/20 rounded-full blur-[140px]" />
+      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
+    </div>
 
-      <main className="max-w-[1600px] mx-auto px-4 py-8 space-y-8">
-        {/* Title & Description */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="h-1 w-12 bg-primary rounded-full" />
-            <h2 className="text-4xl font-bold text-foreground">Algorithm Visualizer</h2>
+    <Header />
+
+    <main className="relative max-w-[1920px] mx-auto px-4 md:px-6 lg:px-10 py-8 space-y-10">
+      
+      {/* ================= HERO ================= */}
+      <section className="grid lg:grid-cols-2 gap-10 items-center">
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="h-1.5 w-16 rounded-full bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400" />
+            <span className="text-xs uppercase tracking-widest text-slate-400">
+              Execution Engine Online
+            </span>
           </div>
-          <p className="text-foreground/70 text-lg max-w-2xl">
-            Watch algorithms come to life. Understand complex computational concepts through interactive visualization.
+
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
+            <span className="bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              StepWise
+            </span>
+          </h1>
+
+          <p className="max-w-xl text-lg text-slate-300 leading-relaxed">
+            A live execution engine for algorithms.
+            <br />
+            <span className="text-slate-400">
+              See data structures think — one step at a time.
+            </span>
           </p>
+
+          <div className="flex flex-wrap gap-3">
+            {[
+              { icon: <Zap className="w-4 h-4" />, label: 'Real-Time' },
+              { icon: <Brain className="w-4 h-4" />, label: 'Interactive' },
+              { icon: <Cpu className="w-4 h-4" />, label: 'Execution-Driven' }
+            ].map((b, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl text-sm font-medium"
+              >
+                {b.icon}
+                {b.label}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left Panel - Controls */}
-          <div className="lg:col-span-1">
-            <ControlPanel
-              category={category}
-              setCategory={setCategory}
-              algorithm={algorithm}
-              setAlgorithm={setAlgorithm}
-              input={input}
-              setInput={setInput}
-              onGenerate={generateSteps}
-              onRandom={generateRandomInput}
-            />
-          </div>
-
-          {/* Center - Visualizer */}
-          <div className="lg:col-span-2">
-            <div className="space-y-6">
-              {/* Visualizer */}
-              <Visualizer steps={steps} currentStep={currentStep} />
-
-              {/* Playback Controls */}
-              <div className="algo-panel">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="h-1 w-8 bg-primary rounded-full" />
-                  <h3 className="font-semibold text-foreground">Playback</h3>
-                </div>
-
-                <div className="flex gap-2 flex-wrap">
-                  <button
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    className={isPlaying ? 'algo-button-danger' : 'algo-button-success'}
-                  >
-                    {isPlaying ? (
-                      <>
-                        <Pause className="w-4 h-4 inline mr-2" />
-                        Pause
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-4 h-4 inline mr-2" />
-                        Play
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => setCurrentStep((s) => Math.min(s + 1, steps.length - 1))}
-                    className="algo-button-primary"
-                  >
-                    <SkipForward className="w-4 h-4 inline mr-2" />
-                    Step
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setCurrentStep(0);
-                      setIsPlaying(false);
-                    }}
-                    className="algo-button-warning"
-                  >
-                    <RotateCcw className="w-4 h-4 inline mr-2" />
-                    Reset
-                  </button>
-                </div>
-
-                {/* Speed Control */}
-                <div className="mt-4 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <label className="text-sm font-medium text-foreground/80">Speed</label>
-                    <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-                      {speed}ms
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="100"
-                    max="2000"
-                    step="100"
-                    value={speed}
-                    onChange={(e) => setSpeed(+e.target.value)}
-                    className="w-full h-2 bg-secondary/50 rounded-lg appearance-none cursor-pointer accent-primary"
-                  />
-                </div>
-
-                {/* Progress */}
-                <div className="mt-4 pt-4 border-t border-border/50">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-xs text-foreground/70">Progress</span>
-                    <span className="text-xs font-semibold text-primary">
-                      {currentStep + 1} / {steps.length}
-                    </span>
-                  </div>
-                  <div className="w-full bg-secondary/50 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-primary to-accent h-full smooth-transition"
-                      style={{ width: steps.length > 0 ? `${((currentStep + 1) / steps.length) * 100}%` : '0%' }}
-                    />
-                  </div>
-                </div>
+        {/* STATUS CARD */}
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-[0_0_60px_rgba(99,102,241,0.15)]">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold">Current Execution</h3>
+              <div className="flex items-center gap-2 text-sm text-slate-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                {category.toUpperCase()} · {algorithm}
               </div>
             </div>
           </div>
 
-          {/* Right Panel - Info */}
-          <div className="lg:col-span-1">
+          <p className="text-sm text-slate-400">
+            {steps.length > 0
+              ? `${steps.length} steps generated · ${currentStep + 1} executed`
+              : 'Awaiting input to generate execution steps'}
+          </p>
+        </div>
+      </section>
+
+      {/* ================= MAIN GRID ================= */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* LEFT: CONTROL PANEL */}
+        <div className="lg:col-span-3">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg">
+            <ControlPanel {...{
+              category,
+              setCategory,
+              algorithm,
+              setAlgorithm,
+              input,
+              setInput,
+              onGenerate: generateSteps,
+              onRandom: generateRandomInput,
+              isLoading: isGenerating
+            }} />
+          </div>
+        </div>
+
+        {/* CENTER: VISUALIZER */}
+        <div className="lg:col-span-6 space-y-6">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_60px_rgba(56,189,248,0.15)] overflow-hidden">
+            
+            {/* VIS HEADER */}
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
+                  {(() => {
+                    const Icon = getCategoryIcon(category);
+                    return <Icon className="w-5 h-5 text-white" />;
+                  })()}
+                </div>
+                <div>
+                  <h3 className="font-semibold tracking-wide">
+                    {category.toUpperCase()} VISUALIZER
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Step-driven execution pipeline
+                  </p>
+                </div>
+              </div>
+
+              <span className="text-xs px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300">
+                STEP {currentStep + 1}
+              </span>
+            </div>
+
+            {/* VIS BODY */}
+            <div className="p-6 min-h-[420px] flex items-center justify-center">
+              <Visualizer steps={steps} currentStep={currentStep} />
+            </div>
+          </div>
+
+          {/* PLAYBACK */}
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-lg space-y-6">
+            
+            {/* BUTTONS */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                disabled={!steps.length}
+                className={`h-12 rounded-xl font-semibold transition-all flex items-center justify-center gap-2
+                ${
+                  isPlaying
+                    ? 'bg-gradient-to-r from-rose-500 to-pink-600 shadow-[0_0_30px_rgba(244,63,94,0.5)]'
+                    : 'bg-gradient-to-r from-indigo-500 to-cyan-500 shadow-[0_0_30px_rgba(99,102,241,0.5)]'
+                }`}
+              >
+                {isPlaying ? <Pause /> : <Play />}
+                {isPlaying ? 'Pause' : 'Play'}
+              </button>
+
+              <button
+                onClick={() => setCurrentStep(s => Math.min(s + 1, steps.length - 1))}
+                className="h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg flex items-center justify-center gap-2"
+              >
+                <SkipForward /> Step
+              </button>
+
+              <button
+                onClick={() => { setCurrentStep(0); setIsPlaying(false); }}
+                className="h-12 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 shadow-lg flex items-center justify-center gap-2"
+              >
+                <RotateCcw /> Reset
+              </button>
+
+              <button
+                onClick={generateSteps}
+                className="h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg flex items-center justify-center gap-2"
+              >
+                <Zap /> Generate
+              </button>
+            </div>
+
+            {/* SPEED */}
+            <div>
+              <div className="flex justify-between text-sm text-slate-400 mb-2">
+                <span>Execution Speed</span>
+                <span>{speed} ms</span>
+              </div>
+              <input
+                type="range"
+                min="100"
+                max="2000"
+                step="100"
+                value={speed}
+                onChange={(e) => setSpeed(+e.target.value)}
+                className="w-full h-2 rounded-lg bg-slate-700 accent-indigo-500"
+              />
+            </div>
+
+            {/* PROGRESS */}
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span>Progress</span>
+                <span>{currentStep + 1}/{steps.length || 1}</span>
+              </div>
+              <div className="h-2.5 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-indigo-500 via-cyan-500 to-emerald-500 transition-all duration-500"
+                  style={{ width: steps.length ? `${((currentStep + 1) / steps.length) * 100}%` : '0%' }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT: INFO PANEL */}
+        <div className="lg:col-span-3">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg h-full">
             <InfoPanel
               currentStep={currentStep}
               totalSteps={steps.length}
               step={steps[currentStep]}
-              algorithmDescription={getAlgorithmDescription()}
+              algorithmDescription={`${category.toUpperCase()} · ${algorithm}`}
             />
           </div>
         </div>
-      </main>
-    </div>
-  );
+      </section>
+    </main>
+  </div>
+);
+
 }
