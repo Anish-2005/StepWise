@@ -13,7 +13,7 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
   /* ================= EMPTY STATE ================= */
   if (!step) {
     return (
-      <div className="relative min-h-[420px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl flex items-center justify-center overflow-hidden">
+      <div className="relative h-full flex items-center justify-center overflow-hidden">
         {/* Ambient glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-500/20 rounded-full blur-[120px]" />
@@ -34,11 +34,11 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
     const maxValue = Math.max(...step.arrayState, 100);
 
     return (
-      <div className="relative min-h-[420px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 overflow-hidden">
+      <div className="relative h-full overflow-hidden">
         {/* Grid backdrop */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_top,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:40px_40px] opacity-30" />
 
-        <div className="relative z-10 flex items-end justify-center gap-2 h-[320px]">
+        <div className="relative z-10 flex items-end justify-center gap-2 h-full">
           {step.arrayState.map((value, idx) => {
             const active = step.indices?.includes(idx);
 
@@ -68,11 +68,11 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
                 className="flex flex-col items-center justify-end flex-1 gap-2"
               >
                 <div
-                  className={`w-full rounded-t-xl transition-all duration-300 ease-out ${barColor} ${glow} ${
+                  className={`w-12 rounded-t-xl transition-all duration-300 ease-out ${barColor} ${glow} ${
                     active ? 'scale-105' : ''
                   }`}
                   style={{
-                    height: `${(value / maxValue) * 300}px`,
+                    height: `${(value / maxValue) * 350}px`,
                   }}
                 />
                 <span className="text-xs font-mono text-slate-400">
@@ -89,7 +89,7 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
   /* ================= GRAPH VISUALIZATION ================= */
   if (step.extra?.visited) {
     return (
-      <div className="relative min-h-[420px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 flex items-center justify-center overflow-hidden">
+      <div className="relative h-full flex items-center justify-center overflow-hidden">
         {/* Glow */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute bottom-1/4 right-1/3 w-72 h-72 bg-emerald-500/20 rounded-full blur-[120px]" />
@@ -127,7 +127,7 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
 
   /* ================= FALLBACK ================= */
   return (
-    <div className="min-h-[420px] rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl flex items-center justify-center">
+    <div className="h-full flex items-center justify-center">
       <p className="text-slate-400 text-sm">
         Visualization not available for this step
       </p>
