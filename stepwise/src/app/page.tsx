@@ -7,6 +7,7 @@ import { buildMaxHeap, insertHeap, extractMax } from '../algorithms/heap';
 import { Step } from '../types';
 
 type CategoryType = 'sorting' | 'graph' | 'heap';
+type AlgorithmType = 'bubble' | 'selection' | 'bfs' | 'dfs' | 'buildHeap' | 'insertHeap' | 'extractMax';
 
 export default function Home() {
   const [category, setCategory] = useState<CategoryType>('sorting');
@@ -37,38 +38,41 @@ export default function Home() {
   }, [category]);
 
   const generateSteps = () => {
-    const data = input.split(',').map(Number);
-    let newSteps: Step[] = [];
-    switch (algorithm) {
-      case 'bubble':
-        newSteps = bubbleSort(data);
-        break;
-      case 'selection':
-        newSteps = selectionSort(data);
-        break;
-      case 'bfs':
-        // For graph, assume adjacency list from input
-        const adj = parseGraphInput(input);
-        newSteps = bfs(adj, 0);
-        break;
-      case 'dfs':
-        const adj2 = parseGraphInput(input);
-        newSteps = dfs(adj2, 0);
-        break;
-      case 'buildHeap':
-        newSteps = buildMaxHeap(data);
-        break;
-      case 'insertHeap':
-        // For insert, assume inserting the first number
-        newSteps = insertHeap(data.slice(1), data[0]);
-        break;
-      case 'extractMax':
-        newSteps = extractMax(data);
-        break;
+    try {
+      const data = input.split(',').map(Number);
+      if (data.some(isNaN)) throw new Error('Invalid numbers');
+      let newSteps: Step[] = [];
+      switch (algorithm) {
+        case 'bubble':
+          newSteps = bubbleSort(data);
+          break;
+        case 'selection':
+          newSteps = selectionSort(data);
+          break;
+        case 'bfs':
+          const adj = parseGraphInput(input);
+          newSteps = bfs(adj, 0);
+          break;
+        case 'dfs':
+          const adj2 = parseGraphInput(input);
+          newSteps = dfs(adj2, 0);
+          break;
+        case 'buildHeap':
+          newSteps = buildMaxHeap(data);
+          break;
+        case 'insertHeap':
+          newSteps = insertHeap(data.slice(1), data[0]);
+          break;
+        case 'extractMax':
+          newSteps = extractMax(data);
+          break;
+      }
+      setSteps(newSteps);
+      setCurrentStep(0);
+      setIsPlaying(false);
+    } catch (error) {
+      alert('Invalid input: ' + (error as Error).message);
     }
-    setSteps(newSteps);
-    setCurrentStep(0);
-    setIsPlaying(false);
   };
 
   const parseGraphInput = (input: string): number[][] => {
@@ -96,6 +100,11 @@ export default function Home() {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
+  };
+
+  const reset = () => {
+    setCurrentStep(0);
+    setIsPlaying(false);
   };
 
   const generateRandomInput = () => {
@@ -301,16 +310,17 @@ export default function Home() {
           </div>
           <div className="mb-4">
             <h3 className="text-lg">Complexity</h3>
-            <p>Time: O(n^2)</p>
-            <p>Space: O(1)</p>
+            <p>Time: {getComplexity().time}</p>
+            <p>Space: {getComplexity().space}</p>
           </div>
           <div>
             <h3 className="text-lg">Pseudocode</h3>
             <pre className="bg-gray-900 p-2 rounded text-sm">
-{`for i in 0 to n-1:
-  for j in 0 to n-i-1:
-    if arr[j] > arr[j+1]:
-      swap arr[j] and arr[j+1]`}
+              {getPseudocode().map((line, idx) => (
+                <div key={idx} className={idx === 0 ? 'bg-yellow-600' : ''}>
+                  {line}
+                </div>
+              ))}
             </pre>
           </div>
         </div>
@@ -354,13 +364,13 @@ function VisualizationCanvas({ steps, currentStep, algorithm }: { steps: Step[],
         <h3 className="text-lg mb-4">Graph Traversal</h3>
         <div className="mb-4">
           <p>Current Node: {step.nodes?.[0]}</p>
-          <p>Visited: {step.extra.visited.map((v, i) => v ? i : '').filter(Boolean).join(', ')}</p>
+          <p>Visited: {step.extra.visited.map((v: boolean, i: number) => v ? i : '').filter(Boolean).join(', ')}</p>
           {step.extra.queue && <p>Queue: {step.extra.queue.join(', ')}</p>}
           {step.extra.stack && <p>Stack: {step.extra.stack.join(', ')}</p>}
         </div>
         {/* Simple node representation */}
         <div className="flex justify-center space-x-4">
-          {step.extra.visited.map((visited, i) => (
+          {step.extra.visited.map((visited: boolean, i: number) => (
             <div
               key={i}
               className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${

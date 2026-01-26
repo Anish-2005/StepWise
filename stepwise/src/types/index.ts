@@ -1,5 +1,5 @@
 export interface Step {
-  type: "compare" | "swap" | "visit" | "push" | "pop" | "done";
+  type: "compare" | "swap" | "visit" | "push" | "pop" | "done" | "enqueue" | "dequeue" | "heapify";
   indices?: number[];
   nodes?: string[];
   arrayState?: number[];
