@@ -51,117 +51,152 @@ export default function ControlPanel({
     };
     return options[category] || [];
   };
+return (
+  <div className="sticky top-24 space-y-6">
 
-  return (
-    <div className="sticky top-24 space-y-4">
-      {/* Category Selector */}
-      <div className="algo-panel space-y-3">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="h-1 w-8 bg-primary rounded-full" />
-          <h3 className="font-semibold text-foreground">Category</h3>
+    {/* ================= CATEGORY ================= */}
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(99,102,241,0.15)]">
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400" />
+          <h3 className="font-semibold tracking-wide text-slate-100">
+            Category
+          </h3>
         </div>
+        <span className="text-xs text-slate-400 uppercase tracking-widest">
+          Mode
+        </span>
+      </div>
 
-        <div className="space-y-2">
-          {getCategoryOptions().map((opt) => (
+      <div className="space-y-2">
+        {getCategoryOptions().map((opt) => {
+          const active = category === opt.value;
+          return (
             <button
               key={opt.value}
               onClick={() => setCategory(opt.value as any)}
-              className={`w-full px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                category === opt.value
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
-                  : 'bg-secondary/50 text-foreground hover:bg-secondary'
-              }`}
+              className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
+                ${
+                  active
+                    ? 'bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-[0_0_25px_rgba(99,102,241,0.5)]'
+                    : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                }
+              `}
             >
               {opt.label}
             </button>
-          ))}
+          );
+        })}
+      </div>
+    </div>
+
+    {/* ================= ALGORITHM ================= */}
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(56,189,248,0.15)]">
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" />
+          <h3 className="font-semibold tracking-wide text-slate-100">
+            Algorithm
+          </h3>
         </div>
+        <span className="text-xs text-slate-400 uppercase tracking-widest">
+          Logic
+        </span>
       </div>
 
-      {/* Algorithm Selector */}
-      <div className="algo-panel space-y-3">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="h-1 w-8 bg-primary rounded-full" />
-          <h3 className="font-semibold text-foreground">Algorithm</h3>
-        </div>
-
-        <div className="space-y-2">
-          {getAlgorithmOptions().map((opt) => (
+      <div className="space-y-2">
+        {getAlgorithmOptions().map((opt) => {
+          const active = algorithm === opt.value;
+          return (
             <button
               key={opt.value}
               onClick={() => setAlgorithm(opt.value)}
-              className={`w-full px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                algorithm === opt.value
-                  ? 'bg-accent text-foreground shadow-lg shadow-accent/30'
-                  : 'bg-secondary/50 text-foreground/70 hover:bg-secondary'
-              }`}
+              className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
+                ${
+                  active
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_0_25px_rgba(16,185,129,0.5)]'
+                    : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                }
+              `}
             >
               {opt.label}
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Input Section */}
-      <div className="algo-panel space-y-3">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="h-1 w-8 bg-primary rounded-full" />
-          <h3 className="font-semibold text-foreground text-sm">Input Data</h3>
-        </div>
-
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="w-full p-3 bg-secondary/50 border border-border/50 rounded-lg text-sm text-foreground placeholder-foreground/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 resize-none"
-          rows={3}
-          placeholder="Enter comma-separated values..."
-        />
-
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={onGenerate}
-            disabled={isLoading}
-            className="algo-button-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? 'Generating...' : 'Generate'}
-          </button>
-          <button
-            onClick={onRandom}
-            disabled={isLoading}
-            className="algo-button-secondary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Shuffle className="w-4 h-4 inline mr-1" />
-            Random
-          </button>
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="algo-panel space-y-3">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="h-1 w-8 bg-primary rounded-full" />
-          <h3 className="font-semibold text-foreground text-sm">Legend</h3>
-        </div>
-
-        <div className="space-y-2 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-blue-500" />
-            <span className="text-foreground/70">Default</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-500" />
-            <span className="text-foreground/70">Comparing</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-red-500" />
-            <span className="text-foreground/70">Swapping</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500" />
-            <span className="text-foreground/70">Sorted</span>
-          </div>
-        </div>
+          );
+        })}
       </div>
     </div>
-  );
+
+    {/* ================= INPUT ================= */}
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(99,102,241,0.15)]">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400" />
+          <h3 className="font-semibold tracking-wide text-slate-100 text-sm">
+            Input Data
+          </h3>
+        </div>
+        <span className="text-xs text-slate-400 uppercase tracking-widest">
+          Params
+        </span>
+      </div>
+
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        rows={3}
+        placeholder="Enter comma-separated values..."
+        className="w-full p-3 rounded-xl bg-black/30 border border-white/10 text-sm text-slate-200
+        placeholder-slate-500 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/50 resize-none"
+      />
+
+      <div className="grid grid-cols-2 gap-3 mt-4">
+        <button
+          onClick={onGenerate}
+          disabled={isLoading}
+          className="h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500
+          text-white font-semibold shadow-[0_0_25px_rgba(99,102,241,0.45)]
+          hover:shadow-[0_0_35px_rgba(99,102,241,0.6)]
+          transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? 'Generating…' : 'Generate'}
+        </button>
+
+        <button
+          onClick={onRandom}
+          disabled={isLoading}
+          className="h-10 rounded-xl bg-white/5 border border-white/10 text-slate-200
+          hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Shuffle className="w-4 h-4 inline mr-1" />
+          Random
+        </button>
+      </div>
+    </div>
+
+    {/* ================= LEGEND ================= */}
+    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(16,185,129,0.15)]">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400" />
+        <h3 className="font-semibold tracking-wide text-slate-100 text-sm">
+          Legend
+        </h3>
+      </div>
+
+      <div className="space-y-2 text-sm">
+        {[
+          ['bg-blue-500', 'Default'],
+          ['bg-yellow-500', 'Comparing'],
+          ['bg-red-500', 'Swapping'],
+          ['bg-green-500', 'Sorted'],
+        ].map(([color, label]) => (
+          <div key={label} className="flex items-center gap-3">
+            <div className={`w-3.5 h-3.5 rounded-md ${color}`} />
+            <span className="text-slate-300">{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 }
