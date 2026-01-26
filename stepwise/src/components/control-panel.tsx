@@ -60,21 +60,21 @@ export default function ControlPanel({
     return options[category] || [];
   };
 return (
-  <div className="sticky top-24 space-y-6">
+  <div className="sticky top-24 space-y-10">
 
     {/* ================= CATEGORY ================= */}
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
-      <div className="flex items-center justify-between mb-5">
+    <section className="space-y-4">
+      <header className="space-y-1">
         <div className="flex items-center gap-3">
-          <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400" />
-          <h3 className="font-semibold tracking-wide text-slate-100">
-            Category
-          </h3>
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            1 · Category
+          </span>
+          <div className="h-px flex-1 bg-slate-200" />
         </div>
-        <span className="text-xs text-slate-400 uppercase tracking-widest">
-          Mode
-        </span>
-      </div>
+        <p className="text-sm text-slate-600">
+          Choose the type of problem you want to explore.
+        </p>
+      </header>
 
       <div className="space-y-2">
         {getCategoryOptions().map((opt) => {
@@ -83,11 +83,13 @@ return (
             <button
               key={opt.value}
               onClick={() => setCategory(opt.value as any)}
-              className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
+              className={`
+                w-full px-4 py-2.5 rounded-xl text-sm font-medium text-left
+                transition-all duration-200
                 ${
                   active
-                    ? 'bg-gradient-to-r from-indigo-500 to-cyan-500 text-white shadow-lg'
-                    : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                 }
               `}
             >
@@ -96,21 +98,21 @@ return (
           );
         })}
       </div>
-    </div>
+    </section>
 
     {/* ================= ALGORITHM ================= */}
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
-      <div className="flex items-center justify-between mb-5">
+    <section className="space-y-4">
+      <header className="space-y-1">
         <div className="flex items-center gap-3">
-          <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" />
-          <h3 className="font-semibold tracking-wide text-slate-100">
-            Algorithm
-          </h3>
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            2 · Algorithm
+          </span>
+          <div className="h-px flex-1 bg-slate-200" />
         </div>
-        <span className="text-xs text-slate-400 uppercase tracking-widest">
-          Logic
-        </span>
-      </div>
+        <p className="text-sm text-slate-600">
+          Select the specific algorithm to execute.
+        </p>
+      </header>
 
       <div className="space-y-2">
         {getAlgorithmOptions().map((opt) => {
@@ -119,11 +121,13 @@ return (
             <button
               key={opt.value}
               onClick={() => setAlgorithm(opt.value)}
-              className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
+              className={`
+                w-full px-4 py-2.5 rounded-xl text-sm font-medium text-left
+                transition-all duration-200
                 ${
                   active
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
-                    : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                    ? 'bg-emerald-600 text-white shadow-sm'
+                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                 }
               `}
             >
@@ -132,39 +136,45 @@ return (
           );
         })}
       </div>
-    </div>
+    </section>
 
     {/* ================= INPUT ================= */}
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
-      <div className="flex items-center justify-between mb-4">
+    <section className="space-y-4">
+      <header className="space-y-1">
         <div className="flex items-center gap-3">
-          <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400" />
-          <h3 className="font-semibold tracking-wide text-slate-100 text-sm">
-            Input Data
-          </h3>
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            3 · Input
+          </span>
+          <div className="h-px flex-1 bg-slate-200" />
         </div>
-        <span className="text-xs text-slate-400 uppercase tracking-widest">
-          Params
-        </span>
-      </div>
+        <p className="text-sm text-slate-600">
+          Provide the data the algorithm will operate on.
+        </p>
+      </header>
 
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
         rows={3}
-        placeholder="Enter comma-separated values..."
-        className="w-full p-3 rounded-xl bg-black/30 border border-white/10 text-sm text-slate-200
-        placeholder-slate-500 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/50 resize-none"
+        placeholder="Example: 64, 34, 25, 12, 22"
+        className="
+          w-full p-3 rounded-xl text-sm
+          bg-white border border-slate-200 text-slate-800
+          placeholder-slate-400
+          focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500
+          resize-none
+        "
       />
 
-      <div className="grid grid-cols-2 gap-3 mt-4">
+      <div className="grid grid-cols-2 gap-3">
         <button
           onClick={onGenerate}
           disabled={isLoading}
-          className="h-10 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500
-          text-white font-semibold shadow-lg
-          hover:shadow-xl
-          transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="
+            h-10 rounded-xl bg-blue-600 text-white font-semibold
+            hover:bg-blue-700 transition
+            disabled:opacity-50 disabled:cursor-not-allowed
+          "
         >
           {isLoading ? 'Generating…' : 'Generate'}
         </button>
@@ -172,39 +182,45 @@ return (
         <button
           onClick={onRandom}
           disabled={isLoading}
-          className="h-10 rounded-xl bg-white/5 border border-white/10 text-slate-200
-          hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="
+            h-10 rounded-xl bg-white border border-slate-200
+            text-slate-700 font-medium
+            hover:bg-slate-50 transition
+            disabled:opacity-50 disabled:cursor-not-allowed
+          "
         >
           <Shuffle className="w-4 h-4 inline mr-1" />
           Random
         </button>
       </div>
-    </div>
+    </section>
 
     {/* ================= LEGEND ================= */}
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-lg">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400" />
-        <h3 className="font-semibold tracking-wide text-slate-100 text-sm">
+    <section className="space-y-4 pt-2">
+      <header className="flex items-center gap-3">
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
           Legend
-        </h3>
-      </div>
+        </span>
+        <div className="h-px flex-1 bg-slate-200" />
+      </header>
 
       <div className="space-y-2 text-sm">
         {[
-          ['bg-blue-500', 'Default'],
+          ['bg-blue-500', 'Default state'],
           ['bg-yellow-500', 'Comparing'],
           ['bg-red-500', 'Swapping'],
-          ['bg-green-500', 'Sorted'],
+          ['bg-green-500', 'Final position'],
         ].map(([color, label]) => (
           <div key={label} className="flex items-center gap-3">
-            <div className={`w-3.5 h-3.5 rounded-md ${color}`} />
-            <span className="text-slate-300">{label}</span>
+            <div className={`w-3 h-3 rounded-sm ${color}`} />
+            <span className="text-slate-600">{label}</span>
           </div>
         ))}
       </div>
-    </div>
+    </section>
+
   </div>
 );
+
 
 }

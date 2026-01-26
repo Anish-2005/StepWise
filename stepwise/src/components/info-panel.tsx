@@ -53,54 +53,55 @@ export default function InfoPanel({
   const progress =
     totalSteps > 0 ? Math.round(((currentStep + 1) / totalSteps) * 100) : 0;
 
-  return (
-    <div className="sticky top-24 space-y-6">
+ return (
+  <div className="sticky top-24 space-y-10">
 
-      {/* ================= STEP STATUS ================= */}
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(99,102,241,0.15)]">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3">
-            <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400" />
-            <h3 className="font-semibold tracking-wide text-slate-100">
-              Step Status
-            </h3>
-          </div>
-          <Activity className="w-4 h-4 text-indigo-400" />
+    {/* ================= STEP STATUS ================= */}
+    <section className="space-y-4">
+      <header className="space-y-1">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Execution Step
+          </span>
+          <div className="h-px flex-1 bg-slate-200" />
         </div>
+      </header>
 
-        {/* STEP COUNT */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-5">
         <div className="flex items-end justify-between mb-4">
           <div>
-            <div className="text-xs text-slate-400 mb-1">Current Step</div>
-            <div className="text-3xl font-bold text-indigo-300">
+            <div className="text-xs text-slate-500 mb-1">
+              Current Step
+            </div>
+            <div className="text-3xl font-bold text-slate-900">
               {totalSteps > 0 ? currentStep + 1 : 0}
-              <span className="text-sm text-slate-400 ml-1">
+              <span className="text-sm text-slate-500 ml-1">
                 / {totalSteps}
               </span>
             </div>
           </div>
 
-          <div className="text-xs px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-300">
+          <div className="text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">
             {progress}%
           </div>
         </div>
 
-        {/* PROGRESS BAR */}
-        <div className="h-2.5 bg-slate-700/50 rounded-full overflow-hidden">
+        {/* Progress bar */}
+        <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-indigo-500 via-cyan-500 to-emerald-500 transition-all duration-500"
+            className="h-full bg-blue-600 transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        {/* OPERATION TYPE */}
+        {/* Operation */}
         {step && (
-          <div className="mt-5">
-            <div className="text-xs text-slate-400 mb-2">
+          <div className="mt-5 space-y-2">
+            <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
               Current Operation
             </div>
             <span
-              className={`inline-block px-3 py-1.5 rounded-xl text-sm font-semibold border ${getStepTypeStyle(
+              className={`inline-block px-3 py-1.5 rounded-lg text-sm font-semibold border ${getStepTypeStyle(
                 step.type
               )}`}
             >
@@ -109,67 +110,72 @@ export default function InfoPanel({
           </div>
         )}
 
-        {/* DESCRIPTION */}
+        {/* Description */}
         {step?.description && (
-          <div className="mt-4 text-sm text-slate-300 leading-relaxed">
+          <p className="mt-4 text-sm text-slate-700 leading-relaxed">
             {step.description}
-          </div>
+          </p>
         )}
 
         {totalSteps === 0 && (
-          <div className="mt-4 p-3 rounded-xl bg-violet-500/10 border border-violet-400/30 text-xs text-slate-300">
-            Generate steps to activate the execution engine.
+          <div className="mt-4 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">
+            Generate an algorithm to begin execution.
           </div>
         )}
       </div>
+    </section>
 
-      {/* ================= ALGORITHM INFO ================= */}
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(56,189,248,0.15)]">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" />
-          <h3 className="font-semibold tracking-wide text-slate-100 text-sm">
-            Algorithm Info
-          </h3>
-        </div>
+    {/* ================= ALGORITHM INFO ================= */}
+    <section className="space-y-4">
+      <header className="flex items-center gap-3">
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          Algorithm Context
+        </span>
+        <div className="h-px flex-1 bg-slate-200" />
+      </header>
 
-        <p className="text-sm text-slate-300 leading-relaxed">
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
+        <p className="text-sm text-slate-700 leading-relaxed">
           {algorithmDescription}
         </p>
 
-        <div className="mt-4 pt-4 border-t border-white/10 flex items-start gap-2 text-xs text-slate-400">
-          <Info className="w-4 h-4 mt-0.5 text-cyan-400" />
+        <div className="pt-4 border-t border-slate-200 flex items-start gap-2 text-xs text-slate-600">
+          <Info className="w-4 h-4 mt-0.5 text-blue-600" />
           <span>
-            Observe how each operation transforms the data structure in real time.
+            Follow how the algorithm modifies its internal state at each step.
           </span>
         </div>
       </div>
+    </section>
 
-      {/* ================= STATISTICS ================= */}
-      {totalSteps > 0 && (
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-[0_0_40px_rgba(16,185,129,0.15)]">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-1.5 w-10 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400" />
-            <h3 className="font-semibold tracking-wide text-slate-100 text-sm">
-              Execution Metrics
-            </h3>
+    {/* ================= METRICS ================= */}
+    {totalSteps > 0 && (
+      <section className="space-y-4">
+        <header className="flex items-center gap-3">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Execution Metrics
+          </span>
+          <div className="h-px flex-1 bg-slate-200" />
+        </header>
+
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 text-sm">
+          <div className="flex justify-between">
+            <span className="text-slate-600">Total Steps</span>
+            <span className="font-semibold text-slate-900">
+              {totalSteps}
+            </span>
           </div>
 
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-slate-400">Total Steps</span>
-              <span className="font-semibold text-indigo-300">
-                {totalSteps}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Progress</span>
-              <span className="font-semibold text-emerald-300">
-                {progress}%
-              </span>
-            </div>
+          <div className="flex justify-between">
+            <span className="text-slate-600">Progress</span>
+            <span className="font-semibold text-blue-700">
+              {progress}%
+            </span>
           </div>
         </div>
-      )}
-    </div>
-  );
+      </section>
+    )}
+  </div>
+);
+
 }
