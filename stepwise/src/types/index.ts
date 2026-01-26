@@ -4,6 +4,7 @@ export interface Step {
   nodes?: string[];
   arrayState?: number[];
   extra?: any;
+  description?: string;
 }
 
 export interface SortStep extends Step {
