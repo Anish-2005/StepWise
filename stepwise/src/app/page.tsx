@@ -326,7 +326,7 @@ export default function Home() {
 
             {/* VIS BODY */}
             <div className="p-6 min-h-[420px] flex items-center justify-center">
-              <Visualizer steps={steps} currentStep={currentStep} />
+              <Visualizer steps={steps} currentStep={currentStep} algorithm={algorithm} />
             </div>
           </div>
 

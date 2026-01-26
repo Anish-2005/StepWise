@@ -6,9 +6,10 @@ import { Step } from '@/types';
 interface VisualizerProps {
   steps: Step[];
   currentStep: number;
+  algorithm?: string;
 }
 
-export default function Visualizer({ steps, currentStep }: VisualizerProps) {
+export default function Visualizer({ steps, currentStep, algorithm }: VisualizerProps) {
   const step = steps[currentStep];
 
   /* ================= EMPTY STATE ================= */
@@ -34,13 +35,452 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
   if (step.arrayState) {
     const maxValue = Math.max(...step.arrayState, 100);
 
+    // Custom visualizations for sorting algorithms
+    if (algorithm === 'bubble') {
+      return renderBubbleSortVisualization(step, maxValue);
+    } else if (algorithm === 'selection') {
+      return renderSelectionSortVisualization(step, maxValue);
+    } else if (algorithm === 'insertion') {
+      return renderInsertionSortVisualization(step, maxValue);
+    } else if (algorithm === 'merge') {
+      return renderMergeSortVisualization(step, maxValue);
+    } else if (algorithm === 'quick') {
+      return renderQuickSortVisualization(step, maxValue);
+    }
+
+    // Default array visualization for heap operations and other cases
+    return renderDefaultArrayVisualization(step, maxValue);
+  }
+
+  /* ================= CUSTOM VISUALIZATION FUNCTIONS ================= */
+
+  function renderBubbleSortVisualization(step: Step, maxValue: number) {
+    return (
+      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+        <div className="relative w-full max-w-4xl">
+          <div className="flex items-end justify-center gap-2 h-80">
+            {step.arrayState!.map((value, idx) => {
+              const active = step.indices?.includes(idx);
+              const isComparing = active && step.type === 'compare';
+              const isSwapping = active && step.type === 'swap';
+
+              let barColor = 'bg-slate-600';
+              let borderColor = 'border-slate-500';
+              let scale = 1;
+
+              if (isSwapping) {
+                barColor = 'bg-rose-600';
+                borderColor = 'border-rose-400';
+                scale = 1.05;
+              } else if (isComparing) {
+                barColor = 'bg-yellow-600';
+                borderColor = 'border-yellow-400';
+              }
+
+              return (
+                <div
+                  key={idx}
+                  className="flex flex-col items-center justify-end flex-1 gap-1"
+                >
+                  <div
+                    className={`w-8 border-2 rounded-t transition-all duration-300 ${barColor} ${borderColor} ${
+                      scale !== 1 ? 'transform scale-105' : ''
+                    }`}
+                    style={{
+                      height: `${(value / maxValue) * 240}px`,
+                    }}
+                  />
+                  <span className="text-xs font-medium text-slate-300">
+                    {value}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Legend */}
+          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+            <div className="flex items-center justify-center gap-8 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-slate-600 border border-slate-500 rounded"></div>
+                <span className="text-slate-300">Unsorted</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-yellow-600 border border-yellow-400 rounded"></div>
+                <span className="text-slate-300">Comparing</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-rose-600 border border-rose-400 rounded"></div>
+                <span className="text-slate-300">Swapping</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderSelectionSortVisualization(step: Step, maxValue: number) {
+    return (
+      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+        <div className="relative w-full max-w-4xl">
+          <div className="flex items-end justify-center gap-2 h-80">
+            {step.arrayState!.map((value, idx) => {
+              const active = step.indices?.includes(idx);
+              const isMin = step.indices && step.indices.length >= 2 && idx === step.indices[1];
+              const isCurrent = step.indices && step.indices.length >= 1 && idx === step.indices[0];
+
+              let barColor = 'bg-slate-600';
+              let borderColor = 'border-slate-500';
+              let scale = 1;
+
+              if (isMin) {
+                barColor = 'bg-emerald-600';
+                borderColor = 'border-emerald-400';
+                scale = 1.05;
+              } else if (isCurrent) {
+                barColor = 'bg-purple-600';
+                borderColor = 'border-purple-400';
+                scale = 1.05;
+              } else if (active) {
+                barColor = 'bg-blue-600';
+                borderColor = 'border-blue-400';
+              }
+
+              return (
+                <div
+                  key={idx}
+                  className="flex flex-col items-center justify-end flex-1 gap-1"
+                >
+                  <div
+                    className={`w-8 border-2 rounded-t transition-all duration-300 ${barColor} ${borderColor} ${
+                      scale !== 1 ? 'transform scale-105' : ''
+                    }`}
+                    style={{
+                      height: `${(value / maxValue) * 240}px`,
+                    }}
+                  />
+                  <span className="text-xs font-medium text-slate-300">
+                    {value}
+                  </span>
+                  {isMin && (
+                    <div className="text-xs text-emerald-400 font-semibold">MIN</div>
+                  )}
+                  {isCurrent && (
+                    <div className="text-xs text-purple-400 font-semibold">CURRENT</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Legend */}
+          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+            <div className="flex items-center justify-center gap-8 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-slate-600 border border-slate-500 rounded"></div>
+                <span className="text-slate-300">Unsorted</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-purple-600 border border-purple-400 rounded"></div>
+                <span className="text-slate-300">Current</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-emerald-600 border border-emerald-400 rounded"></div>
+                <span className="text-slate-300">Minimum</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderInsertionSortVisualization(step: Step, maxValue: number) {
+    return (
+      <div className="relative h-full overflow-hidden">
+        {/* Insertion background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 to-teal-950/40" />
+        <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(16,185,129,0.1)_25%,transparent_25%,transparent_75%,rgba(16,185,129,0.1)_75%)] bg-[length:20px_20px]" />
+
+        <div className="relative z-10 flex items-end justify-center gap-3 h-full pt-16">
+          {step.arrayState!.map((value, idx) => {
+            const active = step.indices?.includes(idx);
+            const isInserting = active && step.type === 'compare';
+            const isShifting = active && step.type === 'swap';
+
+            let barColor = 'bg-gradient-to-t from-slate-500/40 to-slate-400/60';
+            let glow = '';
+            let effect = '';
+            let arrow = null;
+
+            if (isInserting) {
+              barColor = 'bg-gradient-to-t from-cyan-500/70 to-blue-400/90';
+              glow = 'shadow-[0_0_25px_rgba(6,182,212,0.8)]';
+              effect = 'animate-pulse';
+              arrow = '↓';
+            } else if (isShifting) {
+              barColor = 'bg-gradient-to-t from-emerald-500/70 to-teal-400/90';
+              glow = 'shadow-[0_0_25px_rgba(16,185,129,0.8)]';
+              effect = 'animate-bounce';
+              arrow = '→';
+            } else if (active) {
+              barColor = 'bg-gradient-to-t from-blue-500/50 to-blue-400/70';
+              glow = 'shadow-[0_0_15px_rgba(59,130,246,0.6)]';
+            }
+
+            return (
+              <div
+                key={idx}
+                className="flex flex-col items-center justify-end flex-1 gap-2"
+              >
+                {arrow && (
+                  <div className={`text-2xl font-bold transition-all duration-300 ${
+                    isInserting ? 'text-cyan-400 animate-bounce' : 'text-emerald-400 animate-pulse'
+                  }`}>
+                    {arrow}
+                  </div>
+                )}
+                <div
+                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${
+                    active ? 'scale-105' : ''
+                  }`}
+                  style={{
+                    height: `${(value / maxValue) * 280}px`,
+                  }}
+                />
+                <span className="text-sm font-bold text-slate-300">
+                  {value}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Legend */}
+        <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+          <div className="flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-slate-500/60"></div>
+              <span className="text-slate-300">Sorted</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-cyan-500/60 animate-pulse"></div>
+              <span className="text-slate-300">Inserting</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-emerald-500/60 animate-bounce"></div>
+              <span className="text-slate-300">Shifting</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderMergeSortVisualization(step: Step, maxValue: number) {
+    const array = step.arrayState!;
+    const mid = Math.floor(array.length / 2);
+
+    return (
+      <div className="relative h-full overflow-hidden">
+        {/* Merge background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-900/20 to-red-950/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(249,115,22,0.1),transparent_50%)]" />
+
+        {/* Split line */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="absolute top-16 bottom-20 w-1 bg-gradient-to-b from-orange-500/60 to-red-500/60 transition-all duration-500"
+            style={{
+              left: `${15 + (mid * 70) + 35}px`,
+              boxShadow: '0 0 20px rgba(249, 115, 22, 0.5)',
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 flex items-end justify-center gap-3 h-full pt-16">
+          {array.map((value, idx) => {
+            const active = step.indices?.includes(idx);
+            const isLeftHalf = idx < mid;
+            const isMerging = step.type === 'compare' || step.type === 'swap';
+
+            let barColor = isLeftHalf
+              ? 'bg-gradient-to-t from-blue-500/50 to-blue-400/70'
+              : 'bg-gradient-to-t from-purple-500/50 to-purple-400/70';
+            let glow = '';
+            let effect = '';
+
+            if (active && isMerging) {
+              barColor = 'bg-gradient-to-t from-orange-500/70 to-red-500/90';
+              glow = 'shadow-[0_0_25px_rgba(249,115,22,0.8)]';
+              effect = 'animate-pulse';
+            }
+
+            return (
+              <div
+                key={idx}
+                className="flex flex-col items-center justify-end flex-1 gap-2"
+              >
+                <div
+                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${
+                    active ? 'scale-105' : ''
+                  }`}
+                  style={{
+                    height: `${(value / maxValue) * 280}px`,
+                  }}
+                />
+                <span className="text-sm font-bold text-slate-300">
+                  {value}
+                </span>
+                <div className={`text-xs font-bold ${isLeftHalf ? 'text-blue-400' : 'text-purple-400'}`}>
+                  {isLeftHalf ? 'LEFT' : 'RIGHT'}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Legend */}
+        <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+          <div className="flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-500/60"></div>
+              <span className="text-slate-300">Left Half</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-purple-500/60"></div>
+              <span className="text-slate-300">Right Half</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-orange-500/60 animate-pulse"></div>
+              <span className="text-slate-300">Merging</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderQuickSortVisualization(step: Step, maxValue: number) {
+    const array = step.arrayState!;
+    const pivot = step.indices && step.indices.length > 0 ? step.indices[0] : -1;
+    const left = step.indices && step.indices.length > 1 ? step.indices[1] : -1;
+    const right = step.indices && step.indices.length > 2 ? step.indices[2] : -1;
+
+    return (
+      <div className="relative h-full overflow-hidden">
+        {/* Quick sort background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-900/20 to-rose-950/40" />
+        <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(244,63,94,0.1),transparent,rgba(236,72,153,0.1))]" />
+
+        {/* Pivot highlight */}
+        {pivot >= 0 && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div
+              className="absolute top-16 w-16 h-16 border-4 border-pink-500/60 rounded-full transition-all duration-500 animate-spin"
+              style={{
+                left: `${15 + (pivot * 70) + 7}px`,
+                boxShadow: '0 0 30px rgba(244, 63, 94, 0.4)',
+              }}
+            />
+          </div>
+        )}
+
+        <div className="relative z-10 flex items-end justify-center gap-3 h-full pt-16">
+          {array.map((value, idx) => {
+            const isPivot = idx === pivot;
+            const isLeftPointer = idx === left;
+            const isRightPointer = idx === right;
+            const isActive = step.indices?.includes(idx);
+
+            let barColor = 'bg-gradient-to-t from-slate-500/40 to-slate-400/60';
+            let glow = '';
+            let effect = '';
+            let label = '';
+
+            if (isPivot) {
+              barColor = 'bg-gradient-to-t from-pink-500/70 to-rose-500/90';
+              glow = 'shadow-[0_0_30px_rgba(244,63,94,0.9)]';
+              effect = 'animate-pulse';
+              label = 'PIVOT';
+            } else if (isLeftPointer) {
+              barColor = 'bg-gradient-to-t from-blue-500/70 to-cyan-500/90';
+              glow = 'shadow-[0_0_25px_rgba(6,182,212,0.8)]';
+              effect = 'animate-bounce';
+              label = 'LEFT';
+            } else if (isRightPointer) {
+              barColor = 'bg-gradient-to-t from-purple-500/70 to-indigo-500/90';
+              glow = 'shadow-[0_0_25px_rgba(139,92,246,0.8)]';
+              effect = 'animate-bounce';
+              label = 'RIGHT';
+            } else if (isActive) {
+              barColor = 'bg-gradient-to-t from-emerald-500/50 to-teal-400/70';
+              glow = 'shadow-[0_0_20px_rgba(16,185,129,0.7)]';
+            }
+
+            return (
+              <div
+                key={idx}
+                className="flex flex-col items-center justify-end flex-1 gap-2"
+              >
+                <div
+                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${
+                    isActive ? 'scale-105' : ''
+                  }`}
+                  style={{
+                    height: `${(value / maxValue) * 280}px`,
+                  }}
+                />
+                <span className="text-sm font-bold text-slate-300">
+                  {value}
+                </span>
+                {label && (
+                  <div className={`text-xs font-bold animate-pulse ${
+                    isPivot ? 'text-pink-400' :
+                    isLeftPointer ? 'text-blue-400' : 'text-purple-400'
+                  }`}>
+                    {label}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Legend */}
+        <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+          <div className="flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-slate-500/60"></div>
+              <span className="text-slate-300">Unsorted</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-pink-500/60 animate-pulse"></div>
+              <span className="text-slate-300">Pivot</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-500/60 animate-bounce"></div>
+              <span className="text-slate-300">Left Pointer</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-purple-500/60 animate-bounce"></div>
+              <span className="text-slate-300">Right Pointer</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderDefaultArrayVisualization(step: Step, maxValue: number) {
     return (
       <div className="relative h-full overflow-hidden">
         {/* Grid backdrop */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_top,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:40px_40px] opacity-30" />
 
         <div className="relative z-10 flex items-end justify-center gap-2 h-full">
-          {step.arrayState.map((value, idx) => {
+          {step.arrayState!.map((value, idx) => {
             const active = step.indices?.includes(idx);
 
             let barColor =
@@ -89,201 +529,24 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
 
   /* ================= GRAPH VISUALIZATION ================= */
   if (step.extra?.adj && (step.extra?.visited || step.extra?.distances || step.extra?.gScore)) {
-    const adj = step.extra.adj || [];
-    const weights = step.extra.weights || [];
-    const nodeCount = step.extra.visited.length;
-    const centerX = 200;
-    const centerY = 200;
-    const radius = 120;
+    // Custom visualizations for graph algorithms
+    if (algorithm === 'bfs') {
+      return renderBFSVisualization(step);
+    } else if (algorithm === 'dfs') {
+      return renderDFSVisualization(step);
+    } else if (algorithm === 'dijkstra') {
+      return renderDijkstraVisualization(step);
+    } else if (algorithm === 'astar') {
+      return renderAStarVisualization(step);
+    }
 
-    // Calculate node positions in a circle
-    const getNodePosition = (index: number) => {
-      const angle = (index * 2 * Math.PI) / nodeCount - Math.PI / 2;
-      return {
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle)
-      };
-    };
-
-    return (
-      <div className="relative h-full flex items-center justify-center overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-[100px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-full blur-[100px]" />
-        </div>
-
-        <div className="relative z-10">
-          <svg width="400" height="400" className="overflow-visible">
-            {/* Draw edges */}
-            {adj.map((neighbors: number[], fromIdx: number) =>
-              neighbors.map((toIdx: number) => {
-                const fromPos = getNodePosition(fromIdx);
-                const toPos = getNodePosition(toIdx);
-                const weight = weights[fromIdx]?.[toIdx] || 1;
-                const isActive = step.nodes?.includes(String(fromIdx)) || step.nodes?.includes(String(toIdx));
-
-                return (
-                  <g key={`${fromIdx}-${toIdx}`}>
-                    {/* Edge line */}
-                    <line
-                      x1={fromPos.x}
-                      y1={fromPos.y}
-                      x2={toPos.x}
-                      y2={toPos.y}
-                      stroke={isActive ? "#f472b6" : "#64748b"}
-                      strokeWidth={isActive ? "3" : "2"}
-                      className="transition-all duration-300"
-                      markerEnd={isActive ? "url(#arrowhead-active)" : "url(#arrowhead)"}
-                    />
-
-                    {/* Edge weight */}
-                    <text
-                      x={(fromPos.x + toPos.x) / 2}
-                      y={(fromPos.y + toPos.y) / 2 - 5}
-                      textAnchor="middle"
-                      className={`text-xs font-semibold ${isActive ? 'fill-pink-400' : 'fill-slate-400'} transition-all duration-300`}
-                    >
-                      {weight}
-                    </text>
-                  </g>
-                );
-              })
-            )}
-
-            {/* Arrow markers */}
-            <defs>
-              <marker
-                id="arrowhead"
-                markerWidth="10"
-                markerHeight="7"
-                refX="9"
-                refY="3.5"
-                orient="auto"
-              >
-                <polygon
-                  points="0 0, 10 3.5, 0 7"
-                  fill="#64748b"
-                />
-              </marker>
-              <marker
-                id="arrowhead-active"
-                markerWidth="10"
-                markerHeight="7"
-                refX="9"
-                refY="3.5"
-                orient="auto"
-              >
-                <polygon
-                  points="0 0, 10 3.5, 0 7"
-                  fill="#f472b6"
-                />
-              </marker>
-            </defs>
-
-            {/* Draw nodes */}
-            {step.extra.visited.map((visited: boolean, idx: number) => {
-              const pos = getNodePosition(idx);
-              const isCurrent = step.nodes?.[0] === String(idx) ||
-                               (step.extra?.path && step.extra.path.includes(idx));
-              const isInQueue = step.extra?.queue?.includes(idx);
-              const isInStack = step.extra?.stack?.includes(idx);
-              const isInOpenSet = step.extra?.openSet?.includes(idx);
-              const distance = step.extra?.distances?.[idx];
-              const gScore = step.extra?.gScore?.[idx];
-              const fScore = step.extra?.fScore?.[idx];
-
-              let nodeStyle = 'fill-blue-500/20 stroke-blue-400';
-              let glow = '';
-              let scale = 1;
-
-              if (isCurrent) {
-                nodeStyle = 'fill-rose-500/30 stroke-rose-400';
-                glow = 'drop-shadow(0 0 20px rgba(244, 63, 94, 0.8))';
-                scale = 1.2;
-              } else if (visited) {
-                nodeStyle = 'fill-emerald-500/30 stroke-emerald-400';
-                glow = 'drop-shadow(0 0 15px rgba(16, 185, 129, 0.6))';
-              } else if (isInQueue || isInStack || isInOpenSet) {
-                nodeStyle = 'fill-amber-500/20 stroke-amber-400';
-                glow = 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.5))';
-              }
-
-              return (
-                <g key={idx} transform={`translate(${pos.x}, ${pos.y}) scale(${scale})`}>
-                  {/* Node circle */}
-                  <circle
-                    r="24"
-                    className={`${nodeStyle} transition-all duration-500 cursor-pointer`}
-                    style={{ filter: glow }}
-                  />
-
-                  {/* Node label */}
-                  <text
-                    textAnchor="middle"
-                    dy="6"
-                    className="text-lg font-bold fill-slate-200 transition-all duration-300"
-                  >
-                    {idx}
-                  </text>
-
-                  {/* Distance/Path info */}
-                  {(distance !== undefined || gScore !== undefined) && (
-                    <text
-                      textAnchor="middle"
-                      dy="-32"
-                      className="text-xs font-semibold fill-slate-300"
-                    >
-                      {distance !== undefined ? `d:${distance === Infinity ? '∞' : distance}` :
-                       gScore !== undefined ? `g:${gScore === Infinity ? '∞' : gScore}` : ''}
-                    </text>
-                  )}
-
-                  {fScore !== undefined && (
-                    <text
-                      textAnchor="middle"
-                      dy="-18"
-                      className="text-xs font-semibold fill-slate-400"
-                    >
-                      f:{fScore === Infinity ? '∞' : fScore}
-                    </text>
-                  )}
-                </g>
-              );
-            })}
-          </svg>
-
-          {/* Algorithm info overlay */}
-          <div className="absolute bottom-4 left-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-500/50"></div>
-                  <span className="text-slate-300">Unvisited</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-amber-500/50"></div>
-                  <span className="text-slate-300">In Queue/Stack</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500/50"></div>
-                  <span className="text-slate-300">Visited</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-rose-500/50"></div>
-                  <span className="text-slate-300">Current</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    // Default graph visualization
+    return renderDefaultGraphVisualization(step);
   }
 
   /* ================= HEAP VISUALIZATION ================= */
   if (step.arrayState && step.type && ['compare', 'swap', 'heapify'].includes(step.type) && !step.extra?.adj) {
-    const array = step.arrayState;
+    const array: number[] = Array.isArray(step.arrayState) ? step.arrayState : [];
     const maxValue = Math.max(...array, 100);
 
     // Calculate tree positions
@@ -480,6 +743,689 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 rounded-full bg-emerald-500/50"></div>
                 <span className="text-slate-300">Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ================= GRAPH VISUALIZATION ================= */
+  if (step.extra?.adj && (step.extra?.visited || step.extra?.distances || step.extra?.gScore)) {
+    // Custom visualizations for graph algorithms
+    if (algorithm === 'bfs') {
+      return renderBFSVisualization(step);
+    } else if (algorithm === 'dfs') {
+      return renderDFSVisualization(step);
+    } else if (algorithm === 'dijkstra') {
+      return renderDijkstraVisualization(step);
+    } else if (algorithm === 'astar') {
+      return renderAStarVisualization(step);
+    }
+
+    // Default graph visualization
+    return renderDefaultGraphVisualization(step);
+  }
+
+  /* ================= CUSTOM GRAPH VISUALIZATION FUNCTIONS ================= */
+
+  function renderBFSVisualization(step: Step) {
+    const adj = step.extra!.adj || [];
+    const nodeCount = step.extra!.visited.length;
+    const centerX = 200;
+    const centerY = 200;
+    const radius = 120;
+
+    // BFS uses levels - arrange nodes by level
+    const getBFSNodePosition = (index: number) => {
+      const visited = step.extra!.visited;
+      const queue = step.extra!.queue || [];
+
+      // Calculate level based on visitation order (simplified)
+      let level = 0;
+      if (visited[index]) {
+        level = Math.floor(index / 3) + 1; // Rough approximation
+      }
+
+      const nodesInLevel = Math.min(4, nodeCount - level * 3);
+      const positionInLevel = index % nodesInLevel;
+      const levelRadius = radius - level * 30;
+
+      const angle = (positionInLevel * 2 * Math.PI) / nodesInLevel - Math.PI / 2;
+      return {
+        x: centerX + levelRadius * Math.cos(angle),
+        y: centerY + levelRadius * Math.sin(angle)
+      };
+    };
+
+    return (
+      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+        <div className="relative">
+          <svg width="400" height="400" className="overflow-visible">
+            {/* Draw edges */}
+            {adj.map((neighbors: number[], fromIdx: number) =>
+              neighbors.map((toIdx: number) => {
+                const fromPos = getBFSNodePosition(fromIdx);
+                const toPos = getBFSNodePosition(toIdx);
+                const isActive = step.nodes?.includes(String(fromIdx)) || step.nodes?.includes(String(toIdx));
+
+                return (
+                  <line
+                    key={`${fromIdx}-${toIdx}`}
+                    x1={fromPos.x}
+                    y1={fromPos.y}
+                    x2={toPos.x}
+                    y2={toPos.y}
+                    stroke={isActive ? "#06b6d4" : "#94a3b8"}
+                    strokeWidth={isActive ? "2" : "1"}
+                    className="transition-all duration-300"
+                  />
+                );
+              })
+            )}
+
+            {/* Draw nodes */}
+            {step.extra!.visited.map((visited: boolean, idx: number) => {
+              const pos = getBFSNodePosition(idx);
+              const isCurrent = step.nodes?.[0] === String(idx);
+              const isInQueue = step.extra!.queue?.includes(idx);
+
+              let nodeStyle = 'fill-slate-700 stroke-slate-500';
+              let scale = 1;
+
+              if (isCurrent) {
+                nodeStyle = 'fill-cyan-600 stroke-cyan-400';
+                scale = 1.1;
+              } else if (visited) {
+                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+              } else if (isInQueue) {
+                nodeStyle = 'fill-amber-600 stroke-amber-500';
+              }
+
+              return (
+                <g key={idx} transform={`translate(${pos.x}, ${pos.y}) scale(${scale})`}>
+                  <circle
+                    r="20"
+                    className={`${nodeStyle} transition-all duration-300`}
+                  />
+                  <text
+                    textAnchor="middle"
+                    dy="5"
+                    className="text-sm font-semibold fill-white"
+                  >
+                    {idx}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* BFS Queue visualization */}
+          {step.extra!.queue && step.extra!.queue.length > 0 && (
+            <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-sm rounded-md px-3 py-2 border border-slate-600">
+              <div className="text-xs font-semibold text-slate-300 mb-1">QUEUE</div>
+              <div className="flex gap-1">
+                {step.extra!.queue.map((nodeIdx: number, queueIdx: number) => (
+                  <div
+                    key={nodeIdx}
+                    className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${
+                      queueIdx === 0
+                        ? 'bg-cyan-600/80 text-white border-cyan-400'
+                        : 'bg-slate-700/50 text-slate-300 border-slate-500'
+                    }`}
+                  >
+                    {nodeIdx}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Legend */}
+          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+            <div className="flex items-center justify-center gap-8 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-slate-700 border border-slate-500"></div>
+                <span className="text-slate-300">Unvisited</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-amber-600 border border-amber-500"></div>
+                <span className="text-slate-300">In Queue</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
+                <span className="text-slate-300">Visited</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-cyan-600 border border-cyan-400"></div>
+                <span className="text-slate-300">Current</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderDFSVisualization(step: Step) {
+    const adj = step.extra!.adj || [];
+    const nodeCount = step.extra!.visited.length;
+    const centerX = 200;
+    const centerY = 200;
+
+    // DFS uses a stack - show as a vertical stack
+    const getDFSNodePosition = (index: number) => {
+      const stack = step.extra!.stack || [];
+      const stackIndex = stack.indexOf(index);
+
+      if (stackIndex >= 0) {
+        // Node is in stack - position vertically
+        return {
+          x: centerX - 120,
+          y: centerY - 60 + stackIndex * 40
+        };
+      } else {
+        // Node not in stack - position in exploration area
+        const angle = (index * 2 * Math.PI) / nodeCount - Math.PI / 2;
+        return {
+          x: centerX + 100 * Math.cos(angle),
+          y: centerY + 100 * Math.sin(angle)
+        };
+      }
+    };
+
+    return (
+      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+        <div className="relative">
+          <svg width="400" height="400" className="overflow-visible">
+            {/* Draw edges */}
+            {adj.map((neighbors: number[], fromIdx: number) =>
+              neighbors.map((toIdx: number) => {
+                const fromPos = getDFSNodePosition(fromIdx);
+                const toPos = getDFSNodePosition(toIdx);
+                const isActive = step.nodes?.includes(String(fromIdx)) || step.nodes?.includes(String(toIdx));
+
+                return (
+                  <line
+                    key={`${fromIdx}-${toIdx}`}
+                    x1={fromPos.x}
+                    y1={fromPos.y}
+                    x2={toPos.x}
+                    y2={toPos.y}
+                    stroke={isActive ? "#a855f7" : "#94a3b8"}
+                    strokeWidth={isActive ? "2" : "1"}
+                    className="transition-all duration-300"
+                  />
+                );
+              })
+            )}
+
+            {/* Draw nodes */}
+            {step.extra!.visited.map((visited: boolean, idx: number) => {
+              const pos = getDFSNodePosition(idx);
+              const isCurrent = step.nodes?.[0] === String(idx);
+              const isInStack = step.extra!.stack?.includes(idx);
+
+              let nodeStyle = 'fill-slate-700 stroke-slate-500';
+              let scale = 1;
+
+              if (isCurrent) {
+                nodeStyle = 'fill-purple-600 stroke-purple-400';
+                scale = 1.1;
+              } else if (visited) {
+                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+              } else if (isInStack) {
+                nodeStyle = 'fill-amber-600 stroke-amber-500';
+              }
+
+              return (
+                <g key={idx} transform={`translate(${pos.x}, ${pos.y}) scale(${scale})`}>
+                  <circle
+                    r="20"
+                    className={`${nodeStyle} transition-all duration-300`}
+                  />
+                  <text
+                    textAnchor="middle"
+                    dy="5"
+                    className="text-sm font-semibold fill-white"
+                  >
+                    {idx}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* DFS Stack visualization */}
+          {step.extra!.stack && step.extra!.stack.length > 0 && (
+            <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-sm rounded-md px-3 py-2 border border-slate-600">
+              <div className="text-xs font-semibold text-slate-300 mb-1">STACK</div>
+              <div className="flex flex-col gap-1">
+                {[...step.extra!.stack].reverse().map((nodeIdx: number, stackIdx: number) => (
+                  <div
+                    key={nodeIdx}
+                    className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${
+                      stackIdx === 0
+                        ? 'bg-purple-600/80 text-white border-purple-400'
+                        : 'bg-slate-700/50 text-slate-300 border-slate-500'
+                    }`}
+                  >
+                    {nodeIdx}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Legend */}
+          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+            <div className="flex items-center justify-center gap-8 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-slate-700 border border-slate-500"></div>
+                <span className="text-slate-300">Unvisited</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-amber-600 border border-amber-500"></div>
+                <span className="text-slate-300">In Stack</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
+                <span className="text-slate-300">Visited</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-purple-600 border border-purple-400"></div>
+                <span className="text-slate-300">Current</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderDijkstraVisualization(step: Step) {
+    const adj = step.extra!.adj || [];
+    const weights = step.extra!.weights || [];
+    const nodeCount = step.extra!.visited.length;
+    const centerX = 200;
+    const centerY = 200;
+    const radius = 120;
+
+    const getNodePosition = (index: number) => {
+      const angle = (index * 2 * Math.PI) / nodeCount - Math.PI / 2;
+      return {
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle)
+      };
+    };
+
+    return (
+      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+        <div className="relative">
+          <svg width="400" height="400" className="overflow-visible">
+            {/* Draw edges with weights */}
+            {adj.map((neighbors: number[], fromIdx: number) =>
+              neighbors.map((toIdx: number) => {
+                const fromPos = getNodePosition(fromIdx);
+                const toPos = getNodePosition(toIdx);
+                const weight = weights[fromIdx]?.[toIdx] || 1;
+                const isActive = step.nodes?.includes(String(fromIdx)) || step.nodes?.includes(String(toIdx));
+
+                return (
+                  <g key={`${fromIdx}-${toIdx}`}>
+                    <line
+                      x1={fromPos.x}
+                      y1={fromPos.y}
+                      x2={toPos.x}
+                      y2={toPos.y}
+                      stroke={isActive ? "#10b981" : "#94a3b8"}
+                      strokeWidth={isActive ? "2" : "1"}
+                      className="transition-all duration-300"
+                    />
+                    <text
+                      x={(fromPos.x + toPos.x) / 2}
+                      y={(fromPos.y + toPos.y) / 2 - 5}
+                      textAnchor="middle"
+                      className={`text-xs font-medium ${isActive ? 'fill-emerald-400' : 'fill-slate-400'} transition-all duration-300`}
+                    >
+                      {weight}
+                    </text>
+                  </g>
+                );
+              })
+            )}
+
+            {/* Draw nodes */}
+            {step.extra!.visited.map((visited: boolean, idx: number) => {
+              const pos = getNodePosition(idx);
+              const isCurrent = step.nodes?.[0] === String(idx);
+              const distance = step.extra!.distances?.[idx];
+
+              let nodeStyle = 'fill-slate-700 stroke-slate-500';
+              let scale = 1;
+
+              if (isCurrent) {
+                nodeStyle = 'fill-emerald-600 stroke-emerald-400';
+                scale = 1.1;
+              } else if (visited) {
+                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+              }
+
+              return (
+                <g key={idx} transform={`translate(${pos.x}, ${pos.y}) scale(${scale})`}>
+                  <circle
+                    r="20"
+                    className={`${nodeStyle} transition-all duration-300`}
+                  />
+                  <text
+                    textAnchor="middle"
+                    dy="5"
+                    className="text-sm font-semibold fill-white"
+                  >
+                    {idx}
+                  </text>
+                  {distance !== undefined && (
+                    <text
+                      textAnchor="middle"
+                      dy="-28"
+                      className="text-xs font-medium fill-cyan-400"
+                    >
+                      d:{distance === Infinity ? '∞' : distance}
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Legend */}
+          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+            <div className="flex items-center justify-center gap-8 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-slate-700 border border-slate-500"></div>
+                <span className="text-slate-300">Unvisited</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
+                <span className="text-slate-300">Visited</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-400"></div>
+                <span className="text-slate-300">Current</span>
+              </div>
+              <div className="text-cyan-400 font-medium">d: Distance</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderAStarVisualization(step: Step) {
+    const adj = step.extra!.adj || [];
+    const weights = step.extra!.weights || [];
+    const nodeCount = step.extra!.visited.length;
+    const centerX = 200;
+    const centerY = 200;
+    const radius = 120;
+
+    const getNodePosition = (index: number) => {
+      const angle = (index * 2 * Math.PI) / nodeCount - Math.PI / 2;
+      return {
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle)
+      };
+    };
+
+    return (
+      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+        <div className="relative">
+          <svg width="400" height="400" className="overflow-visible">
+            {/* Draw edges with weights */}
+            {adj.map((neighbors: number[], fromIdx: number) =>
+              neighbors.map((toIdx: number) => {
+                const fromPos = getNodePosition(fromIdx);
+                const toPos = getNodePosition(toIdx);
+                const weight = weights[fromIdx]?.[toIdx] || 1;
+                const isActive = step.nodes?.includes(String(fromIdx)) || step.nodes?.includes(String(toIdx));
+
+                return (
+                  <g key={`${fromIdx}-${toIdx}`}>
+                    <line
+                      x1={fromPos.x}
+                      y1={fromPos.y}
+                      x2={toPos.x}
+                      y2={toPos.y}
+                      stroke={isActive ? "#f59e0b" : "#94a3b8"}
+                      strokeWidth={isActive ? "2" : "1"}
+                      className="transition-all duration-300"
+                    />
+                    <text
+                      x={(fromPos.x + toPos.x) / 2}
+                      y={(fromPos.y + toPos.y) / 2 - 5}
+                      textAnchor="middle"
+                      className={`text-xs font-medium ${isActive ? 'fill-yellow-400' : 'fill-slate-400'} transition-all duration-300`}
+                    >
+                      {weight}
+                    </text>
+                  </g>
+                );
+              })
+            )}
+
+            {/* Draw nodes */}
+            {step.extra!.visited.map((visited: boolean, idx: number) => {
+              const pos = getNodePosition(idx);
+              const isCurrent = step.nodes?.[0] === String(idx);
+              const isInOpenSet = step.extra!.openSet?.includes(idx);
+              const gScore = step.extra!.gScore?.[idx];
+              const fScore = step.extra!.fScore?.[idx];
+
+              let nodeStyle = 'fill-slate-700 stroke-slate-500';
+              let scale = 1;
+
+              if (isCurrent) {
+                nodeStyle = 'fill-yellow-600 stroke-yellow-400';
+                scale = 1.1;
+              } else if (visited) {
+                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+              } else if (isInOpenSet) {
+                nodeStyle = 'fill-pink-600 stroke-pink-500';
+              }
+
+              return (
+                <g key={idx} transform={`translate(${pos.x}, ${pos.y}) scale(${scale})`}>
+                  <circle
+                    r="20"
+                    className={`${nodeStyle} transition-all duration-300`}
+                  />
+                  <text
+                    textAnchor="middle"
+                    dy="5"
+                    className="text-sm font-semibold fill-white"
+                  >
+                    {idx}
+                  </text>
+                  {gScore !== undefined && (
+                    <text
+                      textAnchor="middle"
+                      dy="-28"
+                      className="text-xs font-medium fill-pink-400"
+                    >
+                      g:{gScore === Infinity ? '∞' : gScore}
+                    </text>
+                  )}
+                  {fScore !== undefined && (
+                    <text
+                      textAnchor="middle"
+                      dy="-16"
+                      className="text-xs font-medium fill-yellow-400"
+                    >
+                      f:{fScore === Infinity ? '∞' : fScore}
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Legend */}
+          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+            <div className="flex items-center justify-center gap-8 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-slate-700 border border-slate-500"></div>
+                <span className="text-slate-300">Unvisited</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-pink-600 border border-pink-500"></div>
+                <span className="text-slate-300">Open Set</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
+                <span className="text-slate-300">Closed Set</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-yellow-600 border border-yellow-400"></div>
+                <span className="text-slate-300">Current</span>
+              </div>
+              <div className="text-pink-400 font-medium">g: Cost</div>
+              <div className="text-yellow-400 font-medium">f: Heuristic</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderDefaultGraphVisualization(step: Step) {
+    const adj = step.extra!.adj || [];
+    const weights = step.extra!.weights || [];
+    const nodeCount = step.extra!.visited.length;
+    const centerX = 200;
+    const centerY = 200;
+    const radius = 120;
+
+    const getNodePosition = (index: number) => {
+      const angle = (index * 2 * Math.PI) / nodeCount - Math.PI / 2;
+      return {
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle)
+      };
+    };
+
+    return (
+      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+        <div className="relative">
+          <svg width="400" height="400" className="overflow-visible">
+            {adj.map((neighbors: number[], fromIdx: number) =>
+              neighbors.map((toIdx: number) => {
+                const fromPos = getNodePosition(fromIdx);
+                const toPos = getNodePosition(toIdx);
+                const weight = weights[fromIdx]?.[toIdx] || 1;
+                const isActive = step.nodes?.includes(String(fromIdx)) || step.nodes?.includes(String(toIdx));
+
+                return (
+                  <g key={`${fromIdx}-${toIdx}`}>
+                    <line
+                      x1={fromPos.x}
+                      y1={fromPos.y}
+                      x2={toPos.x}
+                      y2={toPos.y}
+                      stroke={isActive ? "#f472b6" : "#94a3b8"}
+                      strokeWidth={isActive ? "2" : "1"}
+                      className="transition-all duration-300"
+                    />
+                    <text
+                      x={(fromPos.x + toPos.x) / 2}
+                      y={(fromPos.y + toPos.y) / 2 - 5}
+                      textAnchor="middle"
+                      className={`text-xs font-medium ${isActive ? 'fill-pink-400' : 'fill-slate-400'} transition-all duration-300`}
+                    >
+                      {weight}
+                    </text>
+                  </g>
+                );
+              })
+            )}
+
+            {step.extra!.visited.map((visited: boolean, idx: number) => {
+              const pos = getNodePosition(idx);
+              const isCurrent = step.nodes?.[0] === String(idx) ||
+                               (step.extra?.path && step.extra.path.includes(idx));
+              const isInQueue = step.extra?.queue?.includes(idx);
+              const isInStack = step.extra?.stack?.includes(idx);
+              const isInOpenSet = step.extra?.openSet?.includes(idx);
+              const distance = step.extra?.distances?.[idx];
+              const gScore = step.extra?.gScore?.[idx];
+              const fScore = step.extra?.fScore?.[idx];
+
+              let nodeStyle = 'fill-blue-700 stroke-blue-500';
+              let scale = 1;
+
+              if (isCurrent) {
+                nodeStyle = 'fill-rose-600 stroke-rose-400';
+                scale = 1.1;
+              } else if (visited) {
+                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+              } else if (isInQueue || isInStack || isInOpenSet) {
+                nodeStyle = 'fill-amber-600 stroke-amber-500';
+              }
+
+              return (
+                <g key={idx} transform={`translate(${pos.x}, ${pos.y}) scale(${scale})`}>
+                  <circle
+                    r="20"
+                    className={`${nodeStyle} transition-all duration-300`}
+                  />
+                  <text
+                    textAnchor="middle"
+                    dy="5"
+                    className="text-sm font-semibold fill-white"
+                  >
+                    {idx}
+                  </text>
+                  {(distance !== undefined || gScore !== undefined) && (
+                    <text
+                      textAnchor="middle"
+                      dy="-28"
+                      className="text-xs font-medium fill-slate-300"
+                    >
+                      {distance !== undefined ? `d:${distance === Infinity ? '∞' : distance}` :
+                       gScore !== undefined ? `g:${gScore === Infinity ? '∞' : gScore}` : ''}
+                    </text>
+                  )}
+                  {fScore !== undefined && (
+                    <text
+                      textAnchor="middle"
+                      dy="-16"
+                      className="text-xs font-medium fill-slate-400"
+                    >
+                      f:{fScore === Infinity ? '∞' : fScore}
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+
+          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+            <div className="flex items-center justify-center gap-8 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-blue-700 border border-blue-500"></div>
+                <span className="text-slate-300">Unvisited</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-amber-600 border border-amber-500"></div>
+                <span className="text-slate-300">In Queue/Stack</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
+                <span className="text-slate-300">Visited</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-rose-600 border border-rose-400"></div>
+                <span className="text-slate-300">Current</span>
               </div>
             </div>
           </div>

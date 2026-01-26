@@ -20,6 +20,14 @@ export interface GraphStep extends Step {
     visited: boolean[];
     queue?: number[];
     stack?: number[];
+    distances?: number[];
+    previous?: number[];
+    gScore?: number[];
+    fScore?: number[];
+    adj?: number[][];
+    weights?: number[][];
+    path?: number[];
+    openSet?: number[];
   };
 }
 
