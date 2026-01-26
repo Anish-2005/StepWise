@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap, Brain, Cpu, ArrowRight, Play, BarChart3, ChevronRight } from 'lucide-react';
+import { Zap, Brain, Cpu, ArrowRight, Play, BarChart3 } from 'lucide-react';
 import Logo from './logo';
 
 interface HeroProps {

@@ -1,7 +1,8 @@
 'use client';
 
-import { Zap, Menu, X, Github, Cpu } from 'lucide-react';
+import { Menu, X, Github, Cpu } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Logo from './logo';
 
 interface HeaderProps {
@@ -33,7 +34,7 @@ export default function Header({ className = '' }: HeaderProps) {
         <div className="h-16 flex items-center justify-between">
 
           {/* ================= ENGINE IDENTITY ================= */}
-          <a
+          <Link
             href="/"
             className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 rounded-md"
             aria-label="StepWise Home"
@@ -52,7 +53,7 @@ export default function Header({ className = '' }: HeaderProps) {
                 Algorithm Execution System
               </span>
             </div>
-          </a>
+          </Link>
 
           {/* ================= MODE SWITCHER ================= */}
           <nav

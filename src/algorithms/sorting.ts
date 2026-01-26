@@ -46,7 +46,7 @@ export function insertionSort(arr: number[]): SortStep[] {
   const n = array.length;
 
   for (let i = 1; i < n; i++) {
-    let key = array[i];
+    const key = array[i];
     let j = i - 1;
 
     // Compare with previous elements

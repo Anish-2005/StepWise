@@ -1,7 +1,7 @@
 'use client';
 
 import { Step } from '@/types';
-import { Info, Activity } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 interface InfoPanelProps {
   currentStep: number;

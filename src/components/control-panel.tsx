@@ -1,12 +1,13 @@
 'use client';
 
 import { Shuffle } from 'lucide-react';
+import { AlgorithmType } from '@/types';
 
 interface ControlPanelProps {
   category: 'sorting' | 'graph' | 'heap';
   setCategory: (cat: 'sorting' | 'graph' | 'heap') => void;
-  algorithm: string;
-  setAlgorithm: (algo: any) => void;
+  algorithm: AlgorithmType;
+  setAlgorithm: (algo: AlgorithmType) => void;
   input: string;
   setInput: (input: string) => void;
   onGenerate: () => void;
@@ -82,7 +83,7 @@ return (
           return (
             <button
               key={opt.value}
-              onClick={() => setCategory(opt.value as any)}
+              onClick={() => setCategory(opt.value as 'sorting' | 'graph' | 'heap')}
               className={`
                 w-full px-4 py-2.5 rounded-xl text-sm font-medium text-left
                 transition-all duration-200
@@ -120,7 +121,7 @@ return (
           return (
             <button
               key={opt.value}
-              onClick={() => setAlgorithm(opt.value)}
+              onClick={() => setAlgorithm(opt.value as AlgorithmType)}
               className={`
                 w-full px-4 py-2.5 rounded-xl text-sm font-medium text-left
                 transition-all duration-200

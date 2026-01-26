@@ -3,7 +3,7 @@ export interface Step {
   indices?: number[];
   nodes?: string[];
   arrayState?: number[];
-  extra?: any;
+  extra?: Record<string, unknown>;
   description?: string;
 }
 
@@ -36,3 +36,5 @@ export interface HeapStep extends Step {
   indices: number[];
   arrayState: number[];
 }
+
+export type AlgorithmType = 'bubble' | 'selection' | 'insertion' | 'merge' | 'quick' | 'bfs' | 'dfs' | 'dijkstra' | 'astar' | 'buildHeap' | 'insertHeap' | 'extractMax' | 'heapSort' | 'decreaseKey' | 'deleteHeap';

@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { bubbleSort, selectionSort, insertionSort, mergeSort, quickSort } from '@/algorithms/sorting';
 import { bfs, dfs, dijkstra, aStar } from '@/algorithms/graph';
 import { buildMaxHeap, insertHeap, extractMax, heapSort, decreaseKey, deleteHeap } from '@/algorithms/heap';
-import { Step } from '@/types';
+import { Step, AlgorithmType } from '@/types';
 import Header from '@/components/header';
 import ControlPanel from '@/components/control-panel';
 import Visualizer from '@/components/visualizer';
 import InfoPanel from '@/components/info-panel';
 import Hero from '@/components/hero';
-import { Play, Pause, SkipForward, RotateCcw, Zap, Brain, Cpu, Sparkles } from 'lucide-react';
+import { Play, Pause, SkipForward, RotateCcw, Zap } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
 interface ActionButtonProps {
@@ -58,7 +58,6 @@ function ActionButton({
   );
 }
 type CategoryType = 'sorting' | 'graph' | 'heap';
-type AlgorithmType = 'bubble' | 'selection' | 'insertion' | 'merge' | 'quick' | 'bfs' | 'dfs' | 'dijkstra' | 'astar' | 'buildHeap' | 'insertHeap' | 'extractMax' | 'heapSort' | 'decreaseKey' | 'deleteHeap';
 
 export default function Home() {
   const [category, setCategory] = useState<CategoryType>('sorting');
@@ -67,7 +66,7 @@ export default function Home() {
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [speed, setSpeed] = useState(500);
+  const [speed] = useState(500);
   const [isGenerating, setIsGenerating] = useState(false);
 
   /* Reset on category change */
@@ -183,8 +182,8 @@ export default function Home() {
       setSteps(newSteps);
       setCurrentStep(0);
       setIsPlaying(false);
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsGenerating(false);
     }
@@ -233,15 +232,6 @@ export default function Home() {
       setInput(
         Array.from({ length: 10 }, () => Math.floor(Math.random() * 100)).join(',')
       );
-    }
-  };
-
-  const getCategoryIcon = (cat: CategoryType) => {
-    switch (cat) {
-      case 'sorting': return Sparkles;
-      case 'graph': return Brain;
-      case 'heap': return Cpu;
-      default: return Zap;
     }
   };
 

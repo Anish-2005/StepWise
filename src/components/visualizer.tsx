@@ -782,16 +782,16 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
   /* ================= CUSTOM GRAPH VISUALIZATION FUNCTIONS ================= */
 
   function renderBFSVisualization(step: Step) {
-    const adj = step.extra!.adj || [];
-    const nodeCount = step.extra!.visited.length;
+    const extra = step.extra as { adj?: number[][], visited: boolean[], queue?: number[] };
+    const adj = extra.adj || [];
+    const nodeCount = extra.visited.length;
     const centerX = 200;
     const centerY = 200;
     const radius = 120;
 
     // BFS uses levels - arrange nodes by level
     const getBFSNodePosition = (index: number) => {
-      const visited = step.extra!.visited;
-      const queue = step.extra!.queue || [];
+      const visited = extra.visited;
 
       // Calculate level based on visitation order (simplified)
       let level = 0;
@@ -920,14 +920,15 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
   }
 
   function renderDFSVisualization(step: Step) {
-    const adj = step.extra!.adj || [];
-    const nodeCount = step.extra!.visited.length;
+    const extra = step.extra as { adj?: number[][], visited: boolean[], stack?: number[] };
+    const adj = extra.adj || [];
+    const nodeCount = extra.visited.length;
     const centerX = 200;
     const centerY = 200;
 
     // DFS uses a stack - show as a vertical stack
     const getDFSNodePosition = (index: number) => {
-      const stack = step.extra!.stack || [];
+      const stack = extra.stack || [];
       const stackIndex = stack.indexOf(index);
 
       if (stackIndex >= 0) {
@@ -973,10 +974,10 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
             )}
 
             {/* Draw nodes */}
-            {step.extra!.visited.map((visited: boolean, idx: number) => {
+            {extra.visited.map((visited: boolean, idx: number) => {
               const pos = getDFSNodePosition(idx);
               const isCurrent = step.nodes?.[0] === String(idx);
-              const isInStack = step.extra!.stack?.includes(idx);
+              const isInStack = extra.stack?.includes(idx);
 
               let nodeStyle = 'fill-slate-300 stroke-slate-400';
               let scale = 1;
@@ -1009,11 +1010,11 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
           </svg>
 
           {/* DFS Stack visualization */}
-          {step.extra!.stack && step.extra!.stack.length > 0 && (
+          {extra.stack && extra.stack.length > 0 && (
             <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-md px-3 py-2 border border-slate-300">
               <div className="text-xs font-semibold text-slate-700 mb-1">STACK</div>
               <div className="flex flex-col gap-1">
-                {[...step.extra!.stack].reverse().map((nodeIdx: number, stackIdx: number) => (
+                {[...extra.stack].reverse().map((nodeIdx: number, stackIdx: number) => (
                   <div
                     key={nodeIdx}
                     className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${
@@ -1056,9 +1057,10 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
   }
 
   function renderDijkstraVisualization(step: Step) {
-    const adj = step.extra!.adj || [];
-    const weights = step.extra!.weights || [];
-    const nodeCount = step.extra!.visited.length;
+    const extra = step.extra as { adj?: number[][], weights?: number[][], visited: boolean[], distances?: number[] };
+    const adj = extra.adj || [];
+    const weights = extra.weights || [];
+    const nodeCount = extra.visited.length;
     const centerX = 200;
     const centerY = 200;
     const radius = 120;
@@ -1108,10 +1110,10 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
             )}
 
             {/* Draw nodes */}
-            {step.extra!.visited.map((visited: boolean, idx: number) => {
+            {extra.visited.map((visited: boolean, idx: number) => {
               const pos = getNodePosition(idx);
               const isCurrent = step.nodes?.[0] === String(idx);
-              const distance = step.extra!.distances?.[idx];
+              const distance = extra.distances?.[idx];
 
               let nodeStyle = 'fill-slate-300 stroke-slate-400';
               let scale = 1;
@@ -1174,9 +1176,10 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
   }
 
   function renderAStarVisualization(step: Step) {
-    const adj = step.extra!.adj || [];
-    const weights = step.extra!.weights || [];
-    const nodeCount = step.extra!.visited.length;
+    const extra = step.extra as { adj?: number[][], weights?: number[][], visited: boolean[], openSet?: number[], gScore?: number[], fScore?: number[] };
+    const adj = extra.adj || [];
+    const weights = extra.weights || [];
+    const nodeCount = extra.visited.length;
     const centerX = 200;
     const centerY = 200;
     const radius = 120;
@@ -1226,12 +1229,12 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
             )}
 
             {/* Draw nodes */}
-            {step.extra!.visited.map((visited: boolean, idx: number) => {
+            {extra.visited.map((visited: boolean, idx: number) => {
               const pos = getNodePosition(idx);
               const isCurrent = step.nodes?.[0] === String(idx);
-              const isInOpenSet = step.extra!.openSet?.includes(idx);
-              const gScore = step.extra!.gScore?.[idx];
-              const fScore = step.extra!.fScore?.[idx];
+              const isInOpenSet = extra.openSet?.includes(idx);
+              const gScore = extra.gScore?.[idx];
+              const fScore = extra.fScore?.[idx];
 
               let nodeStyle = 'fill-slate-300 stroke-slate-400';
               let scale = 1;
@@ -1310,9 +1313,10 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
   }
 
   function renderDefaultGraphVisualization(step: Step) {
-    const adj = step.extra!.adj || [];
-    const weights = step.extra!.weights || [];
-    const nodeCount = step.extra!.visited.length;
+    const extra = step.extra as { adj?: number[][], weights?: number[][], visited: boolean[], queue?: number[], stack?: number[], openSet?: number[], distances?: number[], gScore?: number[], fScore?: number[], path?: number[] };
+    const adj = extra.adj || [];
+    const weights = extra.weights || [];
+    const nodeCount = extra.visited.length;
     const centerX = 200;
     const centerY = 200;
     const radius = 120;
@@ -1360,15 +1364,15 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               })
             )}
 
-            {step.extra!.visited.map((visited: boolean, idx: number) => {
+            {extra.visited.map((visited: boolean, idx: number) => {
               const pos = getNodePosition(idx);
               const isCurrent = step.nodes?.[0] === String(idx) ||
-                               (step.extra?.path && step.extra.path.includes(idx));
-              const isInQueue = step.extra?.queue?.includes(idx);
-              const isInStack = step.extra?.stack?.includes(idx);
-              const isInOpenSet = step.extra?.openSet?.includes(idx);
-              const distance = step.extra?.distances?.[idx];
-              const gScore = step.extra?.gScore?.[idx];
+                               (extra.path && extra.path.includes(idx));
+              const isInQueue = extra.queue?.includes(idx);
+              const isInStack = extra.stack?.includes(idx);
+              const isInOpenSet = extra.openSet?.includes(idx);
+              const distance = extra.distances?.[idx];
+              const gScore = extra.gScore?.[idx];
               const fScore = step.extra?.fScore?.[idx];
 
               let nodeStyle = 'fill-blue-300 stroke-blue-400';

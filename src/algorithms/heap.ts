@@ -63,7 +63,6 @@ export function extractMax(arr: number[]): HeapStep[] {
   const array = [...arr];
   if (array.length === 0) return steps;
 
-  const max = array[0];
   array[0] = array[array.length - 1];
   array.pop();
   steps.push({ type: 'swap', indices: [0], arrayState: [...array] });
