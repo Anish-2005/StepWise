@@ -15,16 +15,20 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
   /* ================= EMPTY STATE ================= */
   if (!step) {
     return (
-      <div className="relative h-full flex items-center justify-center overflow-hidden">
-        {/* Ambient glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-500/20 rounded-full blur-[120px]" />
+      <div className="relative h-full flex items-center justify-center overflow-hidden bg-slate-50">
+        {/* Subtle pattern background */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
         </div>
 
         <div className="relative z-10 text-center space-y-4">
-          <Sparkles className="w-16 h-16 mx-auto text-indigo-400" />
-          <p className="text-slate-300 text-sm tracking-wide">
-            Generate an algorithm to begin execution
+          <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+            <Sparkles className="w-8 h-8 text-blue-600" />
+          </div>
+          <p className="text-slate-600 text-sm font-medium">
+            Generate an algorithm to begin visualization
           </p>
         </div>
       </div>
@@ -56,7 +60,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
   function renderBubbleSortVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+      <div className="relative h-full flex items-center justify-center bg-slate-50">
         <div className="relative w-full max-w-4xl">
           <div className="flex items-end justify-center gap-2 h-80">
             {step.arrayState!.map((value, idx) => {
@@ -64,16 +68,16 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               const isComparing = active && step.type === 'compare';
               const isSwapping = active && step.type === 'swap';
 
-              let barColor = 'bg-slate-600';
-              let borderColor = 'border-slate-500';
+              let barColor = 'bg-slate-300';
+              let borderColor = 'border-slate-400';
               let scale = 1;
 
               if (isSwapping) {
-                barColor = 'bg-rose-600';
-                borderColor = 'border-rose-400';
+                barColor = 'bg-red-500';
+                borderColor = 'border-red-400';
                 scale = 1.05;
               } else if (isComparing) {
-                barColor = 'bg-yellow-600';
+                barColor = 'bg-yellow-500';
                 borderColor = 'border-yellow-400';
               }
 
@@ -90,7 +94,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                       height: `${(value / maxValue) * 240}px`,
                     }}
                   />
-                  <span className="text-xs font-medium text-slate-300">
+                  <span className="text-xs font-medium text-slate-600">
                     {value}
                   </span>
                 </div>
@@ -99,19 +103,19 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
           </div>
 
           {/* Legend */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+          <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200 shadow-sm">
             <div className="flex items-center justify-center gap-8 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-slate-600 border border-slate-500 rounded"></div>
-                <span className="text-slate-300">Unsorted</span>
+                <div className="w-3 h-3 bg-slate-300 border border-slate-400 rounded"></div>
+                <span className="text-slate-700 font-medium">Unsorted</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-yellow-600 border border-yellow-400 rounded"></div>
-                <span className="text-slate-300">Comparing</span>
+                <div className="w-3 h-3 bg-yellow-500 border border-yellow-400 rounded"></div>
+                <span className="text-slate-700 font-medium">Comparing</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-rose-600 border border-rose-400 rounded"></div>
-                <span className="text-slate-300">Swapping</span>
+                <div className="w-3 h-3 bg-red-500 border border-red-400 rounded"></div>
+                <span className="text-slate-700 font-medium">Swapping</span>
               </div>
             </div>
           </div>
@@ -122,7 +126,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
   function renderSelectionSortVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+      <div className="relative h-full flex items-center justify-center bg-slate-50">
         <div className="relative w-full max-w-4xl">
           <div className="flex items-end justify-center gap-2 h-80">
             {step.arrayState!.map((value, idx) => {
@@ -130,20 +134,20 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               const isMin = step.indices && step.indices.length >= 2 && idx === step.indices[1];
               const isCurrent = step.indices && step.indices.length >= 1 && idx === step.indices[0];
 
-              let barColor = 'bg-slate-600';
-              let borderColor = 'border-slate-500';
+              let barColor = 'bg-slate-300';
+              let borderColor = 'border-slate-400';
               let scale = 1;
 
               if (isMin) {
-                barColor = 'bg-emerald-600';
-                borderColor = 'border-emerald-400';
+                barColor = 'bg-green-500';
+                borderColor = 'border-green-400';
                 scale = 1.05;
               } else if (isCurrent) {
-                barColor = 'bg-purple-600';
+                barColor = 'bg-purple-500';
                 borderColor = 'border-purple-400';
                 scale = 1.05;
               } else if (active) {
-                barColor = 'bg-blue-600';
+                barColor = 'bg-blue-500';
                 borderColor = 'border-blue-400';
               }
 
@@ -160,14 +164,14 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                       height: `${(value / maxValue) * 240}px`,
                     }}
                   />
-                  <span className="text-xs font-medium text-slate-300">
+                  <span className="text-xs font-medium text-slate-600">
                     {value}
                   </span>
                   {isMin && (
-                    <div className="text-xs text-emerald-400 font-semibold">MIN</div>
+                    <div className="text-xs text-green-600 font-semibold">MIN</div>
                   )}
                   {isCurrent && (
-                    <div className="text-xs text-purple-400 font-semibold">CURRENT</div>
+                    <div className="text-xs text-purple-600 font-semibold">CURRENT</div>
                   )}
                 </div>
               );
@@ -175,19 +179,19 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
           </div>
 
           {/* Legend */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+          <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200 shadow-sm">
             <div className="flex items-center justify-center gap-8 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-slate-600 border border-slate-500 rounded"></div>
-                <span className="text-slate-300">Unsorted</span>
+                <div className="w-3 h-3 bg-slate-300 border border-slate-400 rounded"></div>
+                <span className="text-slate-700 font-medium">Unsorted</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-purple-600 border border-purple-400 rounded"></div>
-                <span className="text-slate-300">Current</span>
+                <div className="w-3 h-3 bg-purple-500 border border-purple-400 rounded"></div>
+                <span className="text-slate-700 font-medium">Current</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-emerald-600 border border-emerald-400 rounded"></div>
-                <span className="text-slate-300">Minimum</span>
+                <div className="w-3 h-3 bg-green-500 border border-green-400 rounded"></div>
+                <span className="text-slate-700 font-medium">Minimum</span>
               </div>
             </div>
           </div>
@@ -198,10 +202,13 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
   function renderInsertionSortVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full overflow-hidden">
-        {/* Insertion background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 to-teal-950/40" />
-        <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(16,185,129,0.1)_25%,transparent_25%,transparent_75%,rgba(16,185,129,0.1)_75%)] bg-[length:20px_20px]" />
+      <div className="relative h-full overflow-hidden bg-slate-50">
+        {/* Subtle pattern background */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5 5-2.24 5-5zm5 0c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5 5-2.24 5-5z'/%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
 
         <div className="relative z-10 flex items-end justify-center gap-3 h-full pt-16">
           {step.arrayState!.map((value, idx) => {
@@ -209,24 +216,24 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
             const isInserting = active && step.type === 'compare';
             const isShifting = active && step.type === 'swap';
 
-            let barColor = 'bg-gradient-to-t from-slate-500/40 to-slate-400/60';
+            let barColor = 'bg-gradient-to-t from-slate-300 to-slate-200';
             let glow = '';
             let effect = '';
             let arrow = null;
 
             if (isInserting) {
-              barColor = 'bg-gradient-to-t from-cyan-500/70 to-blue-400/90';
-              glow = 'shadow-[0_0_25px_rgba(6,182,212,0.8)]';
+              barColor = 'bg-gradient-to-t from-cyan-400 to-cyan-300';
+              glow = 'shadow-lg shadow-cyan-500/30';
               effect = 'animate-pulse';
               arrow = '↓';
             } else if (isShifting) {
-              barColor = 'bg-gradient-to-t from-emerald-500/70 to-teal-400/90';
-              glow = 'shadow-[0_0_25px_rgba(16,185,129,0.8)]';
+              barColor = 'bg-gradient-to-t from-green-400 to-green-300';
+              glow = 'shadow-lg shadow-green-500/30';
               effect = 'animate-bounce';
               arrow = '→';
             } else if (active) {
-              barColor = 'bg-gradient-to-t from-blue-500/50 to-blue-400/70';
-              glow = 'shadow-[0_0_15px_rgba(59,130,246,0.6)]';
+              barColor = 'bg-gradient-to-t from-blue-400 to-blue-300';
+              glow = 'shadow-lg shadow-blue-500/30';
             }
 
             return (
@@ -236,20 +243,20 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               >
                 {arrow && (
                   <div className={`text-2xl font-bold transition-all duration-300 ${
-                    isInserting ? 'text-cyan-400 animate-bounce' : 'text-emerald-400 animate-pulse'
+                    isInserting ? 'text-cyan-600 animate-bounce' : 'text-green-600 animate-pulse'
                   }`}>
                     {arrow}
                   </div>
                 )}
                 <div
-                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${
+                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} border border-white/50 ${
                     active ? 'scale-105' : ''
                   }`}
                   style={{
                     height: `${(value / maxValue) * 280}px`,
                   }}
                 />
-                <span className="text-sm font-bold text-slate-300">
+                <span className="text-sm font-bold text-slate-700">
                   {value}
                 </span>
               </div>
@@ -258,19 +265,19 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
         </div>
 
         {/* Legend */}
-        <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-white/10">
+        <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-slate-200 shadow-sm">
           <div className="flex items-center justify-center gap-6 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-slate-500/60"></div>
-              <span className="text-slate-300">Sorted</span>
+              <div className="w-3 h-3 rounded-full bg-slate-300"></div>
+              <span className="text-slate-700 font-medium">Sorted</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-cyan-500/60 animate-pulse"></div>
-              <span className="text-slate-300">Inserting</span>
+              <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>
+              <span className="text-slate-700 font-medium">Inserting</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-emerald-500/60 animate-bounce"></div>
-              <span className="text-slate-300">Shifting</span>
+              <div className="w-3 h-3 rounded-full bg-green-400 animate-bounce"></div>
+              <span className="text-slate-700 font-medium">Shifting</span>
             </div>
           </div>
         </div>
@@ -475,31 +482,35 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
   function renderDefaultArrayVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full overflow-hidden">
-        {/* Grid backdrop */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_top,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:40px_40px] opacity-30" />
+      <div className="relative h-full overflow-hidden bg-slate-50">
+        {/* Subtle pattern background */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E")`,
+          }} />
+        </div>
 
         <div className="relative z-10 flex items-end justify-center gap-2 h-full">
           {step.arrayState!.map((value, idx) => {
             const active = step.indices?.includes(idx);
 
             let barColor =
-              'bg-gradient-to-t from-blue-500/40 to-blue-400';
+              'bg-gradient-to-t from-blue-200 to-blue-300';
             let glow = '';
 
             if (active) {
               if (step.type === 'compare') {
                 barColor =
-                  'bg-gradient-to-t from-yellow-500 to-yellow-400';
-                glow = 'shadow-[0_0_25px_rgba(234,179,8,0.8)]';
+                  'bg-gradient-to-t from-yellow-300 to-yellow-400';
+                glow = 'shadow-lg shadow-yellow-500/30';
               } else if (step.type === 'swap') {
                 barColor =
-                  'bg-gradient-to-t from-rose-500 to-pink-500';
-                glow = 'shadow-[0_0_25px_rgba(244,63,94,0.8)]';
+                  'bg-gradient-to-t from-red-300 to-red-400';
+                glow = 'shadow-lg shadow-red-500/30';
               } else if (step.type === 'done' || step.type === 'heapify') {
                 barColor =
-                  'bg-gradient-to-t from-emerald-500 to-teal-400';
-                glow = 'shadow-[0_0_25px_rgba(16,185,129,0.8)]';
+                  'bg-gradient-to-t from-green-300 to-green-400';
+                glow = 'shadow-lg shadow-green-500/30';
               }
             }
 
@@ -509,14 +520,14 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                 className="flex flex-col items-center justify-end flex-1 gap-2"
               >
                 <div
-                  className={`w-12 rounded-t-xl transition-all duration-300 ease-out ${barColor} ${glow} ${
+                  className={`w-12 rounded-t-xl transition-all duration-300 ease-out ${barColor} ${glow} border border-white/50 ${
                     active ? 'scale-105' : ''
                   }`}
                   style={{
                     height: `${(value / maxValue) * 350}px`,
                   }}
                 />
-                <span className="text-xs font-mono text-slate-400">
+                <span className="text-xs font-mono text-slate-600">
                   {value}
                 </span>
               </div>
@@ -800,7 +811,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+      <div className="relative h-full flex items-center justify-center bg-slate-50">
         <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {/* Draw edges */}
@@ -817,7 +828,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                     y1={fromPos.y}
                     x2={toPos.x}
                     y2={toPos.y}
-                    stroke={isActive ? "#06b6d4" : "#94a3b8"}
+                    stroke={isActive ? "#06b6d4" : "#cbd5e1"}
                     strokeWidth={isActive ? "2" : "1"}
                     className="transition-all duration-300"
                   />
@@ -831,16 +842,16 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               const isCurrent = step.nodes?.[0] === String(idx);
               const isInQueue = step.extra!.queue?.includes(idx);
 
-              let nodeStyle = 'fill-slate-700 stroke-slate-500';
+              let nodeStyle = 'fill-slate-300 stroke-slate-400';
               let scale = 1;
 
               if (isCurrent) {
-                nodeStyle = 'fill-cyan-600 stroke-cyan-400';
+                nodeStyle = 'fill-cyan-500 stroke-cyan-400';
                 scale = 1.1;
               } else if (visited) {
-                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+                nodeStyle = 'fill-green-500 stroke-green-400';
               } else if (isInQueue) {
-                nodeStyle = 'fill-amber-600 stroke-amber-500';
+                nodeStyle = 'fill-yellow-500 stroke-yellow-400';
               }
 
               return (
@@ -863,16 +874,16 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
           {/* BFS Queue visualization */}
           {step.extra!.queue && step.extra!.queue.length > 0 && (
-            <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-sm rounded-md px-3 py-2 border border-slate-600">
-              <div className="text-xs font-semibold text-slate-300 mb-1">QUEUE</div>
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-200 shadow-sm">
+              <div className="text-xs font-semibold text-slate-700 mb-1">QUEUE</div>
               <div className="flex gap-1">
                 {step.extra!.queue.map((nodeIdx: number, queueIdx: number) => (
                   <div
                     key={nodeIdx}
                     className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${
                       queueIdx === 0
-                        ? 'bg-cyan-600/80 text-white border-cyan-400'
-                        : 'bg-slate-700/50 text-slate-300 border-slate-500'
+                        ? 'bg-cyan-500 text-white border-cyan-400'
+                        : 'bg-slate-200 text-slate-700 border-slate-300'
                     }`}
                   >
                     {nodeIdx}
@@ -883,23 +894,23 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
           )}
 
           {/* Legend */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+          <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200 shadow-sm">
             <div className="flex items-center justify-center gap-8 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-slate-700 border border-slate-500"></div>
-                <span className="text-slate-300">Unvisited</span>
+                <div className="w-3 h-3 rounded-full bg-slate-300 border border-slate-400"></div>
+                <span className="text-slate-700 font-medium">Unvisited</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-600 border border-amber-500"></div>
-                <span className="text-slate-300">In Queue</span>
+                <div className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-400"></div>
+                <span className="text-slate-700 font-medium">In Queue</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
-                <span className="text-slate-300">Visited</span>
+                <div className="w-3 h-3 rounded-full bg-green-500 border border-green-400"></div>
+                <span className="text-slate-700 font-medium">Visited</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-cyan-600 border border-cyan-400"></div>
-                <span className="text-slate-300">Current</span>
+                <div className="w-3 h-3 rounded-full bg-cyan-500 border border-cyan-400"></div>
+                <span className="text-slate-700 font-medium">Current</span>
               </div>
             </div>
           </div>
@@ -936,7 +947,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+      <div className="relative h-full flex items-center justify-center bg-slate-50">
         <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {/* Draw edges */}
@@ -953,7 +964,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                     y1={fromPos.y}
                     x2={toPos.x}
                     y2={toPos.y}
-                    stroke={isActive ? "#a855f7" : "#94a3b8"}
+                    stroke={isActive ? "#a855f7" : "#cbd5e1"}
                     strokeWidth={isActive ? "2" : "1"}
                     className="transition-all duration-300"
                   />
@@ -967,16 +978,16 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               const isCurrent = step.nodes?.[0] === String(idx);
               const isInStack = step.extra!.stack?.includes(idx);
 
-              let nodeStyle = 'fill-slate-700 stroke-slate-500';
+              let nodeStyle = 'fill-slate-300 stroke-slate-400';
               let scale = 1;
 
               if (isCurrent) {
-                nodeStyle = 'fill-purple-600 stroke-purple-400';
+                nodeStyle = 'fill-purple-300 stroke-purple-400';
                 scale = 1.1;
               } else if (visited) {
-                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+                nodeStyle = 'fill-emerald-300 stroke-emerald-400';
               } else if (isInStack) {
-                nodeStyle = 'fill-amber-600 stroke-amber-500';
+                nodeStyle = 'fill-amber-300 stroke-amber-400';
               }
 
               return (
@@ -988,7 +999,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                   <text
                     textAnchor="middle"
                     dy="5"
-                    className="text-sm font-semibold fill-white"
+                    className="text-sm font-semibold fill-slate-700"
                   >
                     {idx}
                   </text>
@@ -999,16 +1010,16 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
           {/* DFS Stack visualization */}
           {step.extra!.stack && step.extra!.stack.length > 0 && (
-            <div className="absolute top-4 left-4 bg-white/10 backdrop-blur-sm rounded-md px-3 py-2 border border-slate-600">
-              <div className="text-xs font-semibold text-slate-300 mb-1">STACK</div>
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-md px-3 py-2 border border-slate-300">
+              <div className="text-xs font-semibold text-slate-700 mb-1">STACK</div>
               <div className="flex flex-col gap-1">
                 {[...step.extra!.stack].reverse().map((nodeIdx: number, stackIdx: number) => (
                   <div
                     key={nodeIdx}
                     className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${
                       stackIdx === 0
-                        ? 'bg-purple-600/80 text-white border-purple-400'
-                        : 'bg-slate-700/50 text-slate-300 border-slate-500'
+                        ? 'bg-purple-300/80 text-slate-700 border-purple-400'
+                        : 'bg-slate-300/50 text-slate-700 border-slate-400'
                     }`}
                   >
                     {nodeIdx}
@@ -1019,23 +1030,23 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
           )}
 
           {/* Legend */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+          <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-300">
             <div className="flex items-center justify-center gap-8 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-slate-700 border border-slate-500"></div>
-                <span className="text-slate-300">Unvisited</span>
+                <div className="w-3 h-3 rounded-full bg-slate-300 border border-slate-400"></div>
+                <span className="text-slate-700">Unvisited</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-600 border border-amber-500"></div>
-                <span className="text-slate-300">In Stack</span>
+                <div className="w-3 h-3 rounded-full bg-amber-300 border border-amber-400"></div>
+                <span className="text-slate-700">In Stack</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
-                <span className="text-slate-300">Visited</span>
+                <div className="w-3 h-3 rounded-full bg-emerald-300 border border-emerald-400"></div>
+                <span className="text-slate-700">Visited</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-600 border border-purple-400"></div>
-                <span className="text-slate-300">Current</span>
+                <div className="w-3 h-3 rounded-full bg-purple-300 border border-purple-400"></div>
+                <span className="text-slate-700">Current</span>
               </div>
             </div>
           </div>
@@ -1061,7 +1072,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+      <div className="relative h-full flex items-center justify-center bg-slate-50">
         <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {/* Draw edges with weights */}
@@ -1079,7 +1090,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                       y1={fromPos.y}
                       x2={toPos.x}
                       y2={toPos.y}
-                      stroke={isActive ? "#10b981" : "#94a3b8"}
+                      stroke={isActive ? "#10b981" : "#cbd5e1"}
                       strokeWidth={isActive ? "2" : "1"}
                       className="transition-all duration-300"
                     />
@@ -1087,7 +1098,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                       x={(fromPos.x + toPos.x) / 2}
                       y={(fromPos.y + toPos.y) / 2 - 5}
                       textAnchor="middle"
-                      className={`text-xs font-medium ${isActive ? 'fill-emerald-400' : 'fill-slate-400'} transition-all duration-300`}
+                      className={`text-xs font-medium ${isActive ? 'fill-emerald-500' : 'fill-slate-500'} transition-all duration-300`}
                     >
                       {weight}
                     </text>
@@ -1102,14 +1113,14 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               const isCurrent = step.nodes?.[0] === String(idx);
               const distance = step.extra!.distances?.[idx];
 
-              let nodeStyle = 'fill-slate-700 stroke-slate-500';
+              let nodeStyle = 'fill-slate-300 stroke-slate-400';
               let scale = 1;
 
               if (isCurrent) {
-                nodeStyle = 'fill-emerald-600 stroke-emerald-400';
+                nodeStyle = 'fill-emerald-300 stroke-emerald-400';
                 scale = 1.1;
               } else if (visited) {
-                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+                nodeStyle = 'fill-emerald-300 stroke-emerald-400';
               }
 
               return (
@@ -1121,7 +1132,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                   <text
                     textAnchor="middle"
                     dy="5"
-                    className="text-sm font-semibold fill-white"
+                    className="text-sm font-semibold fill-slate-700"
                   >
                     {idx}
                   </text>
@@ -1129,7 +1140,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                     <text
                       textAnchor="middle"
                       dy="-28"
-                      className="text-xs font-medium fill-cyan-400"
+                      className="text-xs font-medium fill-cyan-500"
                     >
                       d:{distance === Infinity ? '∞' : distance}
                     </text>
@@ -1140,21 +1151,21 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
           </svg>
 
           {/* Legend */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+          <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-300">
             <div className="flex items-center justify-center gap-8 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-slate-700 border border-slate-500"></div>
-                <span className="text-slate-300">Unvisited</span>
+                <div className="w-3 h-3 rounded-full bg-slate-300 border border-slate-400"></div>
+                <span className="text-slate-700">Unvisited</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
-                <span className="text-slate-300">Visited</span>
+                <div className="w-3 h-3 rounded-full bg-emerald-300 border border-emerald-400"></div>
+                <span className="text-slate-700">Visited</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-400"></div>
-                <span className="text-slate-300">Current</span>
+                <div className="w-3 h-3 rounded-full bg-emerald-300 border border-emerald-400"></div>
+                <span className="text-slate-700">Current</span>
               </div>
-              <div className="text-cyan-400 font-medium">d: Distance</div>
+              <div className="text-cyan-500 font-medium">d: Distance</div>
             </div>
           </div>
         </div>
@@ -1179,7 +1190,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+      <div className="relative h-full flex items-center justify-center bg-slate-50">
         <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {/* Draw edges with weights */}
@@ -1197,7 +1208,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                       y1={fromPos.y}
                       x2={toPos.x}
                       y2={toPos.y}
-                      stroke={isActive ? "#f59e0b" : "#94a3b8"}
+                      stroke={isActive ? "#f59e0b" : "#cbd5e1"}
                       strokeWidth={isActive ? "2" : "1"}
                       className="transition-all duration-300"
                     />
@@ -1205,7 +1216,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                       x={(fromPos.x + toPos.x) / 2}
                       y={(fromPos.y + toPos.y) / 2 - 5}
                       textAnchor="middle"
-                      className={`text-xs font-medium ${isActive ? 'fill-yellow-400' : 'fill-slate-400'} transition-all duration-300`}
+                      className={`text-xs font-medium ${isActive ? 'fill-yellow-500' : 'fill-slate-500'} transition-all duration-300`}
                     >
                       {weight}
                     </text>
@@ -1222,16 +1233,16 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               const gScore = step.extra!.gScore?.[idx];
               const fScore = step.extra!.fScore?.[idx];
 
-              let nodeStyle = 'fill-slate-700 stroke-slate-500';
+              let nodeStyle = 'fill-slate-300 stroke-slate-400';
               let scale = 1;
 
               if (isCurrent) {
-                nodeStyle = 'fill-yellow-600 stroke-yellow-400';
+                nodeStyle = 'fill-yellow-300 stroke-yellow-400';
                 scale = 1.1;
               } else if (visited) {
-                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+                nodeStyle = 'fill-emerald-300 stroke-emerald-400';
               } else if (isInOpenSet) {
-                nodeStyle = 'fill-pink-600 stroke-pink-500';
+                nodeStyle = 'fill-pink-300 stroke-pink-400';
               }
 
               return (
@@ -1243,7 +1254,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                   <text
                     textAnchor="middle"
                     dy="5"
-                    className="text-sm font-semibold fill-white"
+                    className="text-sm font-semibold fill-slate-700"
                   >
                     {idx}
                   </text>
@@ -1251,7 +1262,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                     <text
                       textAnchor="middle"
                       dy="-28"
-                      className="text-xs font-medium fill-pink-400"
+                      className="text-xs font-medium fill-pink-500"
                     >
                       g:{gScore === Infinity ? '∞' : gScore}
                     </text>
@@ -1260,7 +1271,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                     <text
                       textAnchor="middle"
                       dy="-16"
-                      className="text-xs font-medium fill-yellow-400"
+                      className="text-xs font-medium fill-yellow-500"
                     >
                       f:{fScore === Infinity ? '∞' : fScore}
                     </text>
@@ -1271,26 +1282,26 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
           </svg>
 
           {/* Legend */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+          <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-300">
             <div className="flex items-center justify-center gap-8 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-slate-700 border border-slate-500"></div>
-                <span className="text-slate-300">Unvisited</span>
+                <div className="w-3 h-3 rounded-full bg-slate-300 border border-slate-400"></div>
+                <span className="text-slate-700">Unvisited</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-pink-600 border border-pink-500"></div>
-                <span className="text-slate-300">Open Set</span>
+                <div className="w-3 h-3 rounded-full bg-pink-300 border border-pink-400"></div>
+                <span className="text-slate-700">Open Set</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
-                <span className="text-slate-300">Closed Set</span>
+                <div className="w-3 h-3 rounded-full bg-emerald-300 border border-emerald-400"></div>
+                <span className="text-slate-700">Closed Set</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-yellow-600 border border-yellow-400"></div>
-                <span className="text-slate-300">Current</span>
+                <div className="w-3 h-3 rounded-full bg-yellow-300 border border-yellow-400"></div>
+                <span className="text-slate-700">Current</span>
               </div>
-              <div className="text-pink-400 font-medium">g: Cost</div>
-              <div className="text-yellow-400 font-medium">f: Heuristic</div>
+              <div className="text-pink-500 font-medium">g: Cost</div>
+              <div className="text-yellow-500 font-medium">f: Heuristic</div>
             </div>
           </div>
         </div>
@@ -1315,7 +1326,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-900/50">
+      <div className="relative h-full flex items-center justify-center bg-slate-50">
         <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {adj.map((neighbors: number[], fromIdx: number) =>
@@ -1332,7 +1343,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                       y1={fromPos.y}
                       x2={toPos.x}
                       y2={toPos.y}
-                      stroke={isActive ? "#f472b6" : "#94a3b8"}
+                      stroke={isActive ? "#f472b6" : "#cbd5e1"}
                       strokeWidth={isActive ? "2" : "1"}
                       className="transition-all duration-300"
                     />
@@ -1340,7 +1351,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                       x={(fromPos.x + toPos.x) / 2}
                       y={(fromPos.y + toPos.y) / 2 - 5}
                       textAnchor="middle"
-                      className={`text-xs font-medium ${isActive ? 'fill-pink-400' : 'fill-slate-400'} transition-all duration-300`}
+                      className={`text-xs font-medium ${isActive ? 'fill-pink-500' : 'fill-slate-500'} transition-all duration-300`}
                     >
                       {weight}
                     </text>
@@ -1360,16 +1371,16 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               const gScore = step.extra?.gScore?.[idx];
               const fScore = step.extra?.fScore?.[idx];
 
-              let nodeStyle = 'fill-blue-700 stroke-blue-500';
+              let nodeStyle = 'fill-blue-300 stroke-blue-400';
               let scale = 1;
 
               if (isCurrent) {
-                nodeStyle = 'fill-rose-600 stroke-rose-400';
+                nodeStyle = 'fill-rose-300 stroke-rose-400';
                 scale = 1.1;
               } else if (visited) {
-                nodeStyle = 'fill-emerald-600 stroke-emerald-500';
+                nodeStyle = 'fill-emerald-300 stroke-emerald-400';
               } else if (isInQueue || isInStack || isInOpenSet) {
-                nodeStyle = 'fill-amber-600 stroke-amber-500';
+                nodeStyle = 'fill-amber-300 stroke-amber-400';
               }
 
               return (
@@ -1381,7 +1392,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                   <text
                     textAnchor="middle"
                     dy="5"
-                    className="text-sm font-semibold fill-white"
+                    className="text-sm font-semibold fill-slate-700"
                   >
                     {idx}
                   </text>
@@ -1389,7 +1400,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                     <text
                       textAnchor="middle"
                       dy="-28"
-                      className="text-xs font-medium fill-slate-300"
+                      className="text-xs font-medium fill-slate-600"
                     >
                       {distance !== undefined ? `d:${distance === Infinity ? '∞' : distance}` :
                        gScore !== undefined ? `g:${gScore === Infinity ? '∞' : gScore}` : ''}
@@ -1399,7 +1410,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                     <text
                       textAnchor="middle"
                       dy="-16"
-                      className="text-xs font-medium fill-slate-400"
+                      className="text-xs font-medium fill-slate-500"
                     >
                       f:{fScore === Infinity ? '∞' : fScore}
                     </text>
@@ -1409,23 +1420,23 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
             })}
           </svg>
 
-          <div className="absolute bottom-4 left-4 right-4 bg-white/5 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-600">
+          <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-md px-4 py-2 border border-slate-300">
             <div className="flex items-center justify-center gap-8 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-blue-700 border border-blue-500"></div>
-                <span className="text-slate-300">Unvisited</span>
+                <div className="w-3 h-3 rounded-full bg-blue-300 border border-blue-400"></div>
+                <span className="text-slate-700">Unvisited</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-600 border border-amber-500"></div>
-                <span className="text-slate-300">In Queue/Stack</span>
+                <div className="w-3 h-3 rounded-full bg-amber-300 border border-amber-400"></div>
+                <span className="text-slate-700">In Queue/Stack</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-emerald-600 border border-emerald-500"></div>
-                <span className="text-slate-300">Visited</span>
+                <div className="w-3 h-3 rounded-full bg-emerald-300 border border-emerald-400"></div>
+                <span className="text-slate-700">Visited</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-rose-600 border border-rose-400"></div>
-                <span className="text-slate-300">Current</span>
+                <div className="w-3 h-3 rounded-full bg-rose-300 border border-rose-400"></div>
+                <span className="text-slate-700">Current</span>
               </div>
             </div>
           </div>
