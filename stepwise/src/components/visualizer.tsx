@@ -88,7 +88,7 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
   }
 
   /* ================= GRAPH VISUALIZATION ================= */
-  if (step.extra?.visited || step.extra?.distances || step.extra?.gScore) {
+  if (step.extra?.adj && (step.extra?.visited || step.extra?.distances || step.extra?.gScore)) {
     const adj = step.extra.adj || [];
     const weights = step.extra.weights || [];
     const nodeCount = step.extra.visited.length;
@@ -282,7 +282,7 @@ export default function Visualizer({ steps, currentStep }: VisualizerProps) {
   }
 
   /* ================= HEAP VISUALIZATION ================= */
-  if (step.arrayState && step.type && ['compare', 'swap', 'heapify'].includes(step.type)) {
+  if (step.arrayState && step.type && ['compare', 'swap', 'heapify'].includes(step.type) && !step.extra?.adj) {
     const array = step.arrayState;
     const maxValue = Math.max(...array, 100);
 
