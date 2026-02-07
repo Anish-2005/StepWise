@@ -1,15 +1,15 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Zap, Brain, Cpu, ArrowRight, Play, BarChart3, ChevronDown, Sparkles, Database, Layers } from 'lucide-react';
+import { motion, useScroll, useTransform, type Variants } from 'framer-motion';
+import { Brain, ArrowRight, Play, Sparkles, Database, Layers } from 'lucide-react';
+import Image from 'next/image';
 import { useRef } from 'react';
-import Logo from './logo';
 
 interface HeroProps {
   onGetStarted?: () => void;
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -20,7 +20,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 30, opacity: 0, filter: 'blur(10px)' },
   visible: {
     y: 0,
@@ -28,7 +28,7 @@ const itemVariants = {
     filter: 'blur(0px)',
     transition: {
       duration: 1.2,
-      ease: [0.16, 1, 0.3, 1],
+      ease: [0.16, 1, 0.3, 1] as const,
     },
   },
 };
@@ -137,7 +137,12 @@ export default function Hero({ onGetStarted }: HeroProps) {
             <div className="flex -space-x-4">
               {[1, 2, 3, 4, 5].map(i => (
                 <div key={i} className="w-12 h-12 rounded-full border-4 border-slate-50 dark:border-[#020617] bg-slate-200 dark:bg-slate-800 overflow-hidden shadow-xl hover:translate-y-[-4px] transition-transform cursor-pointer">
-                  <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i * 23}`} alt="User" />
+                  <Image
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i * 23}`}
+                    alt="User"
+                    width={48}
+                    height={48}
+                  />
                 </div>
               ))}
               <div className="w-12 h-12 rounded-full border-4 border-slate-50 dark:border-[#020617] bg-blue-600 flex items-center justify-center text-white text-xs font-black shadow-xl">

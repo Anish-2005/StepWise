@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
+import { ReactNode } from 'react';
 import { Step } from '@/types';
 
 interface VisualizerProps {
@@ -10,29 +11,129 @@ interface VisualizerProps {
   algorithm?: string;
 }
 
+interface VisualizerStageProps {
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  children: ReactNode;
+}
+
+function VisualizerStage({
+  title,
+  subtitle,
+  badge,
+  children,
+}: VisualizerStageProps) {
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-slate-50 dark:bg-[#020617] noise-bg">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#94a3b812_1px,transparent_1px),linear-gradient(to_bottom,#94a3b812_1px,transparent_1px)] bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_70%_55%_at_50%_30%,#000_65%,transparent_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(59,130,246,0.18),transparent_55%),radial-gradient(circle_at_85%_15%,rgba(217,70,239,0.15),transparent_50%),radial-gradient(circle_at_70%_80%,rgba(14,165,233,0.12),transparent_50%)]" />
+        <motion.div
+          animate={{ y: [0, -18, 0], x: [0, 12, 0], scale: [1, 1.05, 1] }}
+          transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute -top-24 left-1/4 w-[360px] h-[360px] rounded-full bg-blue-500/20 blur-[120px]"
+        />
+        <motion.div
+          animate={{ y: [0, 22, 0], x: [0, -18, 0], scale: [1, 1.08, 1] }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          className="absolute bottom-[-120px] right-[15%] w-[420px] h-[420px] rounded-full bg-fuchsia-500/15 blur-[140px]"
+        />
+      </div>
+
+      <div className="relative z-10 h-full w-full p-6 sm:p-8 flex flex-col gap-6">
+        <motion.div
+          initial={{ y: 18, opacity: 0, filter: 'blur(8px)' }}
+          animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-wrap items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-tr from-blue-500/50 via-purple-500/40 to-fuchsia-500/50 blur" />
+              <div className="relative h-12 w-12 rounded-2xl premium-gradient flex items-center justify-center text-white shadow-[0_18px_40px_rgba(59,130,246,0.35)]">
+                <Sparkles className="h-5 w-5" />
+              </div>
+            </div>
+            <div>
+              <div className="text-[10px] font-black uppercase tracking-[0.35em] text-slate-400">Algorithm Lab</div>
+              <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">{title}</div>
+              {subtitle && (
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">{subtitle}</div>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-full glass-panel border-slate-200/60 dark:border-slate-800/60">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Live</span>
+            </div>
+            {badge && (
+              <div className="px-4 py-2 rounded-full glass-panel border-blue-500/20 text-[11px] font-black uppercase tracking-[0.25em] text-blue-600 dark:text-blue-300">
+                {badge}
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="relative flex-1 min-h-0 rounded-[28px] glass-panel border-slate-200/70 dark:border-slate-800/70 shadow-[0_25px_70px_rgba(15,23,42,0.15)] overflow-hidden"
+        >
+          <div className="border-beam opacity-50" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.12),transparent_45%),radial-gradient(circle_at_80%_85%,rgba(168,85,247,0.12),transparent_45%)]" />
+          <div className="relative h-full w-full p-4 sm:p-6">
+            {children}
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
 export default function Visualizer({ steps, currentStep, algorithm }: VisualizerProps) {
   const step = steps[currentStep];
 
   /* ================= EMPTY STATE ================= */
   if (!step) {
     return (
-      <div className="relative h-full flex items-center justify-center overflow-hidden bg-slate-50">
-        {/* Subtle pattern background */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
+      <VisualizerStage
+        title="Algorithm Studio"
+        subtitle="Seed a dataset to unlock the live visualization"
+        badge="Idle"
+      >
+        <div className="relative h-full flex items-center justify-center overflow-hidden">
+          <motion.div
+            animate={{ y: [0, -12, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute -top-12 left-1/2 -translate-x-1/2 w-[280px] h-[280px] rounded-full bg-blue-500/10 blur-[90px]"
+          />
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 text-center space-y-6"
+          >
+            <div className="relative mx-auto w-20 h-20">
+              <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-blue-500/30 via-purple-500/30 to-fuchsia-500/30 blur" />
+              <div className="relative w-20 h-20 rounded-3xl glass-panel border-blue-500/20 flex items-center justify-center">
+                <Sparkles className="w-9 h-9 text-blue-600" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-black uppercase tracking-[0.3em] text-slate-400">Awaiting Input</p>
+              <p className="text-slate-600 dark:text-slate-300 text-base font-medium max-w-md mx-auto">
+                Generate an algorithm run to activate the motion engine and see every step animated in real time.
+              </p>
+            </div>
+          </motion.div>
         </div>
-
-        <div className="relative z-10 text-center space-y-4">
-          <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-            <Sparkles className="w-8 h-8 text-blue-600" />
-          </div>
-          <p className="text-slate-600 text-sm font-medium">
-            Generate an algorithm to begin visualization
-          </p>
-        </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
@@ -61,13 +162,13 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
   function renderBubbleSortVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full flex items-center justify-center p-8 overflow-hidden">
-        {/* Decorative Background */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300px] bg-blue-500/5 blur-[100px] rounded-full" />
-        </div>
-
-        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+      <VisualizerStage
+        title="Bubble Sort"
+        subtitle="Adjacent comparisons bubble the maximum forward"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center p-6 overflow-hidden">
+          <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
           <div className="flex items-end justify-center gap-2 sm:gap-4 h-[320px] w-full px-4">
             <AnimatePresence mode="popLayout">
               {step.arrayState!.map((value, idx) => {
@@ -76,7 +177,6 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                 const isSwapping = active && step.type === 'swap';
 
                 let barColor = 'bg-slate-200 dark:bg-slate-800';
-                let glow = '';
 
                 if (isSwapping) {
                   barColor = 'bg-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.6)]';
@@ -146,15 +246,21 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Swapping</span>
             </div>
           </motion.div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
   function renderSelectionSortVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full flex items-center justify-center p-8 overflow-hidden">
-        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+      <VisualizerStage
+        title="Selection Sort"
+        subtitle="Scanning for the minimum and locking it in place"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center p-6 overflow-hidden">
+          <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
           <div className="flex items-end justify-center gap-3 h-[320px] w-full px-4">
             <AnimatePresence mode="popLayout">
               {step.arrayState!.map((value, idx) => {
@@ -224,15 +330,21 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Minimum</span>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
   function renderInsertionSortVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full overflow-hidden p-8">
-        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+      <VisualizerStage
+        title="Insertion Sort"
+        subtitle="Shifting values to build a sorted prefix"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full overflow-hidden p-6">
+          <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
           <div className="flex items-end justify-center gap-3 h-[320px] w-full px-4">
             <AnimatePresence mode="popLayout">
               {step.arrayState!.map((value, idx) => {
@@ -302,8 +414,9 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Shifting</span>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
@@ -312,8 +425,13 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     const mid = Math.floor(array.length / 2);
 
     return (
-      <div className="relative h-full flex items-center justify-center p-8 overflow-hidden">
-        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+      <VisualizerStage
+        title="Merge Sort"
+        subtitle="Two halves merging into a unified order"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center p-6 overflow-hidden">
+          <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
           <div className="flex items-end justify-center gap-3 h-[320px] w-full px-4">
             <AnimatePresence mode="popLayout">
               {array.map((value, idx) => {
@@ -368,8 +486,9 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Merging Status</span>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
@@ -380,8 +499,13 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     const right = step.indices && step.indices.length > 2 ? step.indices[2] : -1;
 
     return (
-      <div className="relative h-full flex items-center justify-center p-8 overflow-hidden">
-        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+      <VisualizerStage
+        title="Quick Sort"
+        subtitle="Partitioning around a pivot with twin pointers"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center p-6 overflow-hidden">
+          <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
           <div className="flex items-end justify-center gap-3 h-[320px] w-full px-4">
             <AnimatePresence mode="popLayout">
               {array.map((value, idx) => {
@@ -454,22 +578,20 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">R-Ptr</span>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
   function renderDefaultArrayVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full overflow-hidden bg-slate-50">
-        {/* Subtle pattern background */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
-        </div>
-
-        <div className="relative z-10 flex items-end justify-center gap-2 h-full">
+      <VisualizerStage
+        title="Array Ops"
+        subtitle="Live array mutations with contextual highlights"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-end justify-center gap-2">
           {step.arrayState!.map((value, idx) => {
             const active = step.indices?.includes(idx);
 
@@ -512,7 +634,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
             );
           })}
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
@@ -567,14 +689,14 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     const treeNodes = getTreeInfo(array);
 
     return (
-      <div className="relative h-full flex items-center justify-center overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-[120px]" />
-        </div>
-
-        <div className="relative z-10">
-          <svg width="400" height="350" className="overflow-visible">
+      <VisualizerStage
+        title="Heap Monitor"
+        subtitle="Binary heap structure with live comparisons"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center overflow-hidden">
+          <div className="relative z-10">
+            <svg width="400" height="350" className="overflow-visible">
             {/* Draw tree edges */}
             {treeNodes.map((node, idx) => {
               const leftChild = idx * 2 + 1;
@@ -670,72 +792,73 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                 </g>
               );
             })}
-          </svg>
+            </svg>
 
-          {/* Array representation */}
-          <div className="mt-6 flex justify-center gap-2">
-            {array.map((value, idx) => {
-              const isActive = step.indices?.includes(idx);
-              const isCompared = step.indices?.includes(idx) && step.type === 'compare';
-              const isSwapped = step.indices?.includes(idx) && step.type === 'swap';
+            {/* Array representation */}
+            <div className="mt-6 flex justify-center gap-2">
+              {array.map((value, idx) => {
+                const isActive = step.indices?.includes(idx);
+                const isCompared = step.indices?.includes(idx) && step.type === 'compare';
+                const isSwapped = step.indices?.includes(idx) && step.type === 'swap';
 
-              let barColor = 'bg-gradient-to-t from-blue-500/40 to-blue-400';
-              let glow = '';
+                let barColor = 'bg-gradient-to-t from-blue-500/40 to-blue-400';
+                let glow = '';
 
-              if (isSwapped) {
-                barColor = 'bg-gradient-to-t from-rose-500 to-pink-500';
-                glow = 'shadow-[0_0_25px_rgba(244,63,94,0.8)]';
-              } else if (isCompared) {
-                barColor = 'bg-gradient-to-t from-yellow-500 to-yellow-400';
-                glow = 'shadow-[0_0_25px_rgba(234,179,8,0.8)]';
-              } else if (isActive) {
-                barColor = 'bg-gradient-to-t from-emerald-500 to-teal-400';
-                glow = 'shadow-[0_0_25px_rgba(16,185,129,0.8)]';
-              }
+                if (isSwapped) {
+                  barColor = 'bg-gradient-to-t from-rose-500 to-pink-500';
+                  glow = 'shadow-[0_0_25px_rgba(244,63,94,0.8)]';
+                } else if (isCompared) {
+                  barColor = 'bg-gradient-to-t from-yellow-500 to-yellow-400';
+                  glow = 'shadow-[0_0_25px_rgba(234,179,8,0.8)]';
+                } else if (isActive) {
+                  barColor = 'bg-gradient-to-t from-emerald-500 to-teal-400';
+                  glow = 'shadow-[0_0_25px_rgba(16,185,129,0.8)]';
+                }
 
-              return (
-                <div
-                  key={idx}
-                  className="flex flex-col items-center justify-end gap-1"
-                >
+                return (
                   <div
-                    className={`w-8 rounded-t transition-all duration-300 ${barColor} ${glow} ${isActive ? 'scale-110' : ''
-                      }`}
-                    style={{
-                      height: `${(value / maxValue) * 60}px`,
-                    }}
-                  />
-                  <span className="text-xs font-mono text-slate-400">
-                    {value}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+                    key={idx}
+                    className="flex flex-col items-center justify-end gap-1"
+                  >
+                    <div
+                      className={`w-8 rounded-t transition-all duration-300 ${barColor} ${glow} ${isActive ? 'scale-110' : ''
+                        }`}
+                      style={{
+                        height: `${(value / maxValue) * 60}px`,
+                      }}
+                    />
+                    <span className="text-xs font-mono text-slate-400">
+                      {value}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
 
-          {/* Legend */}
-          <div className="absolute bottom-2 left-2 right-2 bg-black/50 backdrop-blur-sm rounded-lg p-2 border border-white/10">
-            <div className="flex items-center justify-center gap-4 text-xs">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-blue-500/50"></div>
-                <span className="text-slate-300">Default</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-yellow-500/50"></div>
-                <span className="text-slate-300">Comparing</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-rose-500/50"></div>
-                <span className="text-slate-300">Swapping</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-emerald-500/50"></div>
-                <span className="text-slate-300">Active</span>
+            {/* Legend */}
+            <div className="absolute bottom-2 left-2 right-2 bg-black/50 backdrop-blur-sm rounded-lg p-2 border border-white/10">
+              <div className="flex items-center justify-center gap-4 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-blue-500/50"></div>
+                  <span className="text-slate-300">Default</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-yellow-500/50"></div>
+                  <span className="text-slate-300">Comparing</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-rose-500/50"></div>
+                  <span className="text-slate-300">Swapping</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500/50"></div>
+                  <span className="text-slate-300">Active</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
@@ -788,8 +911,13 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-50">
-        <div className="relative">
+      <VisualizerStage
+        title="Breadth-First Search"
+        subtitle="Wavefront exploration with live queue state"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center">
+          <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {/* Draw edges */}
             {adj.map((neighbors: number[], fromIdx: number) =>
@@ -890,8 +1018,9 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               </div>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
@@ -924,8 +1053,13 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-50">
-        <div className="relative">
+      <VisualizerStage
+        title="Depth-First Search"
+        subtitle="Stack-driven exploration with backtracking"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center">
+          <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {/* Draw edges */}
             {adj.map((neighbors: number[], fromIdx: number) =>
@@ -1026,8 +1160,9 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               </div>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
@@ -1049,8 +1184,13 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-50">
-        <div className="relative">
+      <VisualizerStage
+        title="Dijkstra"
+        subtitle="Shortest paths with weighted edges"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center">
+          <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {/* Draw edges with weights */}
             {adj.map((neighbors: number[], fromIdx: number) =>
@@ -1145,8 +1285,9 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               <div className="text-cyan-500 font-medium">d: Distance</div>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
@@ -1168,8 +1309,13 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-50">
-        <div className="relative">
+      <VisualizerStage
+        title="A* Search"
+        subtitle="Heuristic guidance with open and closed sets"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center">
+          <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {/* Draw edges with weights */}
             {adj.map((neighbors: number[], fromIdx: number) =>
@@ -1282,8 +1428,9 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               <div className="text-yellow-500 font-medium">f: Heuristic</div>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
@@ -1305,8 +1452,13 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     };
 
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-50">
-        <div className="relative">
+      <VisualizerStage
+        title="Graph Exploration"
+        subtitle="Connectivity overview with live state cues"
+        badge={step.type ? step.type.toUpperCase() : 'ACTIVE'}
+      >
+        <div className="relative h-full flex items-center justify-center">
+          <div className="relative">
           <svg width="400" height="400" className="overflow-visible">
             {adj.map((neighbors: number[], fromIdx: number) =>
               neighbors.map((toIdx: number) => {
@@ -1419,18 +1571,25 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
               </div>
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </VisualizerStage>
     );
   }
 
   /* ================= FALLBACK ================= */
   return (
-    <div className="h-full flex items-center justify-center">
-      <p className="text-slate-400 text-sm">
-        Visualization not available for this step
-      </p>
-    </div>
+    <VisualizerStage
+      title="Visualization"
+      subtitle="This step does not have a custom render"
+      badge="Unavailable"
+    >
+      <div className="h-full flex items-center justify-center">
+        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+          Visualization not available for this step
+        </p>
+      </div>
+    </VisualizerStage>
   );
 }
 

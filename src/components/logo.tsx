@@ -56,7 +56,7 @@ export default function Logo({ className = '', size = 'md', showText = true }: L
       </svg>
 
       {showText && (
-        <span className={`font-black text-slate-900 ${textSizeClasses[size]}`}>
+        <span className={`font-black text-slate-900 dark:text-white ${textSizeClasses[size]}`}>
           StepWise
         </span>
       )}

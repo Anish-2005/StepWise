@@ -107,7 +107,7 @@ export default function InfoPanel({
                   {getStepTypeLabel(step.type)}
                 </div>
                 <p className="text-sm font-bold text-slate-700 dark:text-slate-200 leading-relaxed italic">
-                  "{step.description || 'Executing internal logic transformation...'}"
+                  &quot;{step.description || 'Executing internal logic transformation...'}&quot;
                 </p>
               </motion.div>
             ) : (
