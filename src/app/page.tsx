@@ -1,5 +1,6 @@
 'use client';
 
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { bubbleSort, selectionSort, insertionSort, mergeSort, quickSort } from '@/algorithms/sorting';
 import { bfs, dfs, dijkstra, aStar } from '@/algorithms/graph';
@@ -10,7 +11,7 @@ import ControlPanel from '@/components/control-panel';
 import Visualizer from '@/components/visualizer';
 import InfoPanel from '@/components/info-panel';
 import Hero from '@/components/hero';
-import { Play, Pause, SkipForward, RotateCcw, Zap } from 'lucide-react';
+import { Play, Pause, SkipForward, RotateCcw, Zap, Github, Twitter, Linkedin } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
 
 interface ActionButtonProps {
@@ -19,7 +20,8 @@ interface ActionButtonProps {
   onClick: () => void;
   disabled?: boolean;
   active?: boolean;
-  color?: 'blue' | 'green' | 'slate';
+  variant?: 'primary' | 'secondary' | 'accent' | 'emerald' | 'rose';
+  showLabel?: boolean;
 }
 
 function ActionButton({
@@ -28,35 +30,39 @@ function ActionButton({
   onClick,
   disabled,
   active,
-  color = 'slate',
+  variant = 'secondary',
+  showLabel = true,
 }: ActionButtonProps) {
-  const colorStyles = {
-    blue: active
-      ? 'bg-blue-600 text-white'
-      : 'bg-blue-600 hover:bg-blue-700 text-white',
-    green:
-      'bg-green-600 hover:bg-green-700 text-white',
-    slate:
-      'bg-slate-600 hover:bg-slate-700 text-white',
+  const variants = {
+    primary: 'premium-gradient text-white shadow-lg shadow-blue-500/25',
+    secondary: 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-400 dark:hover:border-blue-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/50',
+    accent: 'bg-purple-600 text-white shadow-lg shadow-purple-500/25',
+    emerald: 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/25',
+    rose: 'bg-rose-500 text-white shadow-lg shadow-rose-500/25',
   };
 
   return (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
       onClick={onClick}
       disabled={disabled}
+      title={label}
       className={`
-        h-12 rounded-xl font-medium transition-all duration-200
-        flex items-center justify-center gap-2
-        ${colorStyles[color]}
-        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        ${active ? 'ring-2 ring-blue-300 ring-offset-2 ring-offset-white' : ''}
+        h-11 px-6 rounded-xl font-bold transition-all duration-300
+        flex items-center justify-center gap-3
+        ${variants[variant]}
+        ${disabled ? 'opacity-40 cursor-not-allowed grayscale' : ''}
+        ${active ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-slate-950' : ''}
+        ${!showLabel ? 'w-11 px-0' : ''}
       `}
     >
-      <Icon className="w-4 h-4" />
-      <span>{label}</span>
-    </button>
+      <Icon className={`${showLabel ? 'w-4 h-4' : 'w-5 h-5'}`} />
+      {showLabel && <span className="text-xs uppercase tracking-widest">{label}</span>}
+    </motion.button>
   );
 }
+
 type CategoryType = 'sorting' | 'graph' | 'heap';
 
 export default function Home() {
@@ -116,43 +122,20 @@ export default function Home() {
         const data = input.split(',').map(Number);
         if (data.some(isNaN)) throw new Error('Invalid numbers');
 
-        // Simulate processing time
         await new Promise(resolve => setTimeout(resolve, 300));
 
         switch (algorithm) {
-          case 'bubble':
-            newSteps = bubbleSort(data);
-            break;
-          case 'selection':
-            newSteps = selectionSort(data);
-            break;
-          case 'insertion':
-            newSteps = insertionSort(data);
-            break;
-          case 'merge':
-            newSteps = mergeSort(data);
-            break;
-          case 'quick':
-            newSteps = quickSort(data);
-            break;
-          case 'buildHeap':
-            newSteps = buildMaxHeap(data);
-            break;
-          case 'insertHeap':
-            newSteps = insertHeap(data.slice(1), data[0]);
-            break;
-          case 'extractMax':
-            newSteps = extractMax(data);
-            break;
-          case 'heapSort':
-            newSteps = heapSort(data);
-            break;
-          case 'decreaseKey':
-            newSteps = decreaseKey(data.slice(1), data[0], data[1]);
-            break;
-          case 'deleteHeap':
-            newSteps = deleteHeap(data, data[0]);
-            break;
+          case 'bubble': newSteps = bubbleSort(data); break;
+          case 'selection': newSteps = selectionSort(data); break;
+          case 'insertion': newSteps = insertionSort(data); break;
+          case 'merge': newSteps = mergeSort(data); break;
+          case 'quick': newSteps = quickSort(data); break;
+          case 'buildHeap': newSteps = buildMaxHeap(data); break;
+          case 'insertHeap': newSteps = insertHeap(data.slice(1), data[0]); break;
+          case 'extractMax': newSteps = extractMax(data); break;
+          case 'heapSort': newSteps = heapSort(data); break;
+          case 'decreaseKey': newSteps = decreaseKey(data.slice(1), data[0], data[1]); break;
+          case 'deleteHeap': newSteps = deleteHeap(data, data[0]); break;
         }
       }
 
@@ -162,17 +145,10 @@ export default function Home() {
         const weights = graphData.weights;
 
         switch (algorithm) {
-          case 'bfs':
-            newSteps = bfs(adj, 0);
-            break;
-          case 'dfs':
-            newSteps = dfs(adj, 0);
-            break;
-          case 'dijkstra':
-            newSteps = dijkstra(adj, weights, 0);
-            break;
+          case 'bfs': newSteps = bfs(adj, 0); break;
+          case 'dfs': newSteps = dfs(adj, 0); break;
+          case 'dijkstra': newSteps = dijkstra(adj, weights, 0); break;
           case 'astar':
-            // Simple heuristic for demo (straight-line distance approximation)
             const heuristic = Array(adj.length).fill(0).map((_, i) => Math.abs(i - (adj.length - 1)));
             newSteps = aStar(adj, weights, 0, adj.length - 1, heuristic);
             break;
@@ -194,24 +170,21 @@ export default function Home() {
     const adj: number[][] = [];
     const weights: number[][] = [];
     const lines = input.split(';');
-
     lines.forEach((line) => {
-      const [nodeStr, neighborsStr] = line.split(':');
-      const node = +nodeStr;
-
+      const parts = line.split(':');
+      if (parts.length < 2) return;
+      const node = +parts[0];
+      const neighborsStr = parts[1];
       if (!adj[node]) adj[node] = [];
       if (!weights[node]) weights[node] = [];
-
       if (neighborsStr) {
-        const neighbors = neighborsStr.split(',');
-        neighbors.forEach((neighborStr) => {
+        neighborsStr.split(',').forEach((neighborStr) => {
           const [neighbor, weight = 1] = neighborStr.split('-').map(Number);
           adj[node].push(neighbor);
           weights[node][neighbor] = weight;
         });
       }
     });
-
     return { adj, weights };
   };
 
@@ -229,204 +202,211 @@ export default function Home() {
       }
       setInput(adj.map((v, i) => `${i}:${v.join(',')}`).join(';'));
     } else {
-      setInput(
-        Array.from({ length: 10 }, () => Math.floor(Math.random() * 100)).join(',')
-      );
+      setInput(Array.from({ length: 10 }, () => Math.floor(Math.random() * 100)).join(','));
     }
   };
 
- return (
-  <div className="min-h-screen bg-slate-50 text-slate-900">
-    <Header />
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 selection:bg-blue-100 dark:selection:bg-blue-900 selection:text-blue-900 dark:selection:text-blue-100">
+      <Header />
 
-    <Hero onGetStarted={() => {
-      // Scroll to the algorithm controls section
-      document.getElementById('algorithm-controls')?.scrollIntoView({ behavior: 'smooth' });
-    }} />
+      <Hero onGetStarted={() => {
+        document.getElementById('algorithm-workspace')?.scrollIntoView({ behavior: 'smooth' });
+      }} />
 
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-20">
-
-  {/* ================= CONTEXT HEADER ================= */}
-  <section className="space-y-4">
-    <div className="flex items-center gap-4">
-      <div className="h-1 w-16 bg-blue-600 rounded-full" />
-      <span className="text-sm font-medium text-slate-600">
-        Interactive Execution Workspace
-      </span>
-    </div>
-    <h2 className="text-3xl font-bold text-slate-900 tracking-tight">
-      Algorithm Execution Flow
-    </h2>
-    <p className="max-w-2xl text-slate-600 leading-relaxed">
-      Configure an algorithm, observe how it evolves internally, and understand
-      every decision it makes — one deterministic step at a time.
-    </p>
-  </section>
-
-  {/* ================= EXECUTION WORKSPACE ================= */}
-  <section
-    id="algorithm-controls"
-    className="grid grid-cols-1 lg:grid-cols-[280px_1fr_300px] gap-x-10 gap-y-16 items-start"
-  >
-
-    {/* ========== LEFT: CONFIGURATION (INPUT ZONE) ========== */}
-    <aside className="space-y-6">
-      <div>
-        <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
-          1 · Configure
-        </h3>
-        <p className="text-sm text-slate-600 leading-relaxed">
-          Choose the algorithm and input data to define the execution context.
-        </p>
-      </div>
-
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
-        <ControlPanel
-          {...{
-            category,
-            setCategory,
-            algorithm,
-            setAlgorithm,
-            input,
-            setInput,
-            onGenerate: generateSteps,
-            onRandom: generateRandomInput,
-            isLoading: isGenerating,
-          }}
-        />
-      </div>
-    </aside>
-
-    {/* ========== CENTER: EXECUTION STAGE ========== */}
-    <section className="space-y-8">
-
-      {/* Stage Header */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-            2 · Execute
-          </h3>
-          <h4 className="text-xl font-semibold text-slate-900">
-            {category.charAt(0).toUpperCase() + category.slice(1)} Algorithm
-          </h4>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm font-medium text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full">
-          Step {currentStep + 1}
-        </div>
-      </div>
-
-      {/* Visualization Stage */}
-      <div className="relative bg-slate-50 border border-slate-200 rounded-3xl p-8 min-h-[440px] flex items-center justify-center">
-        <Visualizer
-          steps={steps}
-          currentStep={currentStep}
-          algorithm={algorithm}
-        />
-
-        {/* subtle caption */}
-        <div className="absolute bottom-4 right-6 text-xs text-slate-500">
-          Live execution state
-        </div>
-      </div>
-
-      {/* Playback Controls */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-            Controls
-          </h3>
-          <span className="text-sm text-slate-600">
-            {speed} ms / step
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <ActionButton
-            active={isPlaying}
-            onClick={() => setIsPlaying(!isPlaying)}
-            disabled={!steps.length}
-            label={isPlaying ? 'Pause' : 'Play'}
-            icon={isPlaying ? Pause : Play}
-            color="blue"
-          />
-
-          <ActionButton
-            onClick={() =>
-              setCurrentStep((s) => Math.min(s + 1, steps.length - 1))
-            }
-            disabled={!steps.length}
-            label="Step"
-            icon={SkipForward}
-            color="slate"
-          />
-
-          <ActionButton
-            onClick={() => {
-              setCurrentStep(0);
-              setIsPlaying(false);
-            }}
-            disabled={!steps.length}
-            label="Reset"
-            icon={RotateCcw}
-            color="slate"
-          />
-
-          <ActionButton
-            onClick={generateSteps}
-            disabled={isGenerating}
-            label={isGenerating ? 'Generating' : 'Generate'}
-            icon={Zap}
-            color="green"
-          />
-        </div>
-
-        {/* Progress */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm text-slate-600">
-            <span>Progress</span>
-            <span>
-              {currentStep + 1} / {steps.length || 1}
-            </span>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-32">
+        {/* ================= CONTEXT HEADER ================= */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="space-y-6 text-center max-w-3xl mx-auto"
+        >
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest">
+            <Zap size={12} className="fill-current" />
+            Active Workspace
           </div>
-          <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-blue-600 transition-all duration-300"
-              style={{
-                width: steps.length
-                  ? `${((currentStep + 1) / steps.length) * 100}%`
-                  : '0%',
-              }}
+          <h2 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+            Observe the <span className="text-gradient">Logic Flow</span>
+          </h2>
+          <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+            Witness the intricate dance of data structures. Every swap, comparison,
+            and allocation is revealed in high-fidelity, allowing you to build
+            a mental model of how algorithms actually solve problems.
+          </p>
+        </motion.section>
+
+        {/* ================= EXECUTION WORKSPACE ================= */}
+        <section
+          id="algorithm-workspace"
+          className="grid grid-cols-1 lg:grid-cols-[300px_1fr_320px] gap-x-12 gap-y-16 items-start"
+        >
+          {/* ========== LEFT: CONFIGURATION ========== */}
+          <aside className="space-y-8 sticky top-28">
+            <div className="space-y-2">
+              <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                01 • Configuration
+              </h3>
+              <p className="text-xs font-medium text-slate-500">Define the execution constraints.</p>
+            </div>
+
+            <div className="glass-card rounded-[2rem] p-6 border-slate-200/50 dark:border-slate-800/50 shadow-xl shadow-blue-500/5">
+              <ControlPanel
+                {...{
+                  category, setCategory,
+                  algorithm, setAlgorithm,
+                  input, setInput,
+                  onGenerate: generateSteps,
+                  onRandom: generateRandomInput,
+                  isLoading: isGenerating,
+                }}
+              />
+            </div>
+          </aside>
+
+          {/* ========== CENTER: STAGE ========== */}
+          <section className="space-y-8">
+            <div className="flex items-center justify-between px-2">
+              <div className="space-y-1">
+                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                  02 • Execution Stage
+                </h3>
+                <h4 className="text-2xl font-black text-slate-900 dark:text-white">
+                  {algorithm.split(/(?=[A-Z])/).join(' ').replace(/^\w/, (c) => c.toUpperCase())}
+                </h4>
+              </div>
+              <div className="px-4 py-2 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-mono font-bold">
+                STEP {currentStep + 1} <span className="text-slate-400">/ {steps.length || 0}</span>
+              </div>
+            </div>
+
+            {/* Stage */}
+            <div className="relative glass-card rounded-[2.5rem] p-2 border-slate-200/50 dark:border-slate-800/50 shadow-2xl min-h-[500px] flex flex-col overflow-hidden">
+              <div className="flex-1 rounded-[2rem] bg-slate-50/50 dark:bg-[#020617]/50 relative overflow-hidden flex items-center justify-center">
+                <Visualizer
+                  steps={steps}
+                  currentStep={currentStep}
+                  algorithm={algorithm}
+                />
+              </div>
+
+              {/* Playback Controls Overlay */}
+              <div className="p-6 border-t border-slate-200/50 dark:border-slate-800/50 space-y-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <ActionButton
+                    active={isPlaying}
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    disabled={!steps.length}
+                    label={isPlaying ? 'Freeze' : 'Execute'}
+                    icon={isPlaying ? Pause : Play}
+                    variant={isPlaying ? 'rose' : 'primary'}
+                  />
+                  <ActionButton
+                    onClick={() => setCurrentStep((s) => Math.min(s + 1, steps.length - 1))}
+                    disabled={!steps.length || isPlaying}
+                    label="Pulse"
+                    icon={SkipForward}
+                    variant="secondary"
+                  />
+                  <ActionButton
+                    onClick={() => { setCurrentStep(0); setIsPlaying(false); }}
+                    disabled={!steps.length}
+                    label="Rewind"
+                    icon={RotateCcw}
+                    variant="secondary"
+                  />
+                  <ActionButton
+                    onClick={generateSteps}
+                    disabled={isGenerating}
+                    label={isGenerating ? 'Compiling' : 'Compile'}
+                    icon={Zap}
+                    variant="emerald"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <motion.div
+                      animate={{
+                        width: steps.length ? `${((currentStep + 1) / steps.length) * 100}%` : '0%'
+                      }}
+                      className="h-full premium-gradient shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ========== RIGHT: TELEMETRY ========== */}
+          <aside className="space-y-8 sticky top-28">
+            <div className="space-y-2">
+              <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                03 • Telemetry
+              </h3>
+              <p className="text-xs font-medium text-slate-500">Real-time state analysis.</p>
+            </div>
+            <InfoPanel
+              currentStep={currentStep}
+              totalSteps={steps.length}
+              step={steps[currentStep]}
+              algorithmDescription={`${category.toUpperCase()} • ${algorithm}`}
             />
+          </aside>
+        </section>
+      </main>
+
+      {/* ================= FOOTER ================= */}
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#020617] py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+            <div className="col-span-1 md:col-span-2 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl premium-gradient flex items-center justify-center text-white font-black text-xl">S</div>
+                <span className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white">StepWise</span>
+              </div>
+              <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-sm">
+                Accelerating technical intuition through high-fidelity algorithm visualization. Built for engineers who want to see beneath the abstraction.
+              </p>
+              <div className="flex items-center gap-4">
+                {[Github, Twitter, Linkedin].map((Icon, i) => (
+                  <a key={i} href="#" className="p-2 rounded-lg bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-colors">
+                    <Icon size={18} />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">Platform</h4>
+              <ul className="space-y-3 text-sm text-slate-500 dark:text-slate-400 font-medium">
+                {['Algorithms', 'Data Structures', 'Performance', 'Telemetry'].map(item => (
+                  <li key={item} className="hover:text-blue-500 cursor-pointer transition-colors">{item}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="space-y-6">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-widest">Connect</h4>
+              <ul className="space-y-3 text-sm text-slate-500 dark:text-slate-400 font-medium">
+                {['Documentation', 'Community', 'Github Source', 'Contribute'].map(item => (
+                  <li key={item} className="hover:text-blue-500 cursor-pointer transition-colors">{item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-slate-100 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-slate-400 font-medium">
+              © 2024 StepWise Visualization Labs. All rights reserved.
+            </p>
+            <div className="flex items-center gap-8 text-xs text-slate-400 font-medium">
+              <span className="hover:text-slate-600 cursor-pointer transition-colors">Privacy Policy</span>
+              <span className="hover:text-slate-600 cursor-pointer transition-colors">Terms of Service</span>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    {/* ========== RIGHT: INTERPRETATION ========== */}
-    <aside className="space-y-6">
-      <div>
-        <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3">
-          3 · Understand
-        </h3>
-        <p className="text-sm text-slate-600 leading-relaxed">
-          Interpret what the algorithm is doing at each step.
-        </p>
-      </div>
-
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
-        <InfoPanel
-          currentStep={currentStep}
-          totalSteps={steps.length}
-          step={steps[currentStep]}
-          algorithmDescription={`${category.toUpperCase()} · ${algorithm}`}
-        />
-      </div>
-    </aside>
-  </section>
-</main>
-
-  </div>
-);
-
+      </footer>
+    </div>
+  );
 }

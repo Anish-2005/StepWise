@@ -5,12 +5,12 @@
   --color-foreground: var(--foreground);
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  
+
   --color-primary: #3b82f6;
-  --color-primary-dark: #2563eb;
+  --color-primary-hover: #2563eb;
   --color-secondary: #8b5cf6;
   --color-accent: #f59e0b;
-  
+
   --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 4px 12px -5px rgba(0, 0, 0, 0.05);
   --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
@@ -54,7 +54,9 @@ body {
 .text-gradient {
   background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* Custom scrollbar */
@@ -77,9 +79,17 @@ body {
 
 /* Animation utilities */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .animate-float {

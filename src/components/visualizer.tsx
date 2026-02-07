@@ -312,77 +312,60 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     const mid = Math.floor(array.length / 2);
 
     return (
-      <div className="relative h-full overflow-hidden">
-        {/* Merge background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-900/20 to-red-950/40" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(249,115,22,0.1),transparent_50%)]" />
+      <div className="relative h-full flex items-center justify-center p-8 overflow-hidden">
+        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+          <div className="flex items-end justify-center gap-3 h-[320px] w-full px-4">
+            <AnimatePresence mode="popLayout">
+              {array.map((value, idx) => {
+                const active = step.indices?.includes(idx);
+                const isLeftHalf = idx < mid;
+                const isMerging = (step.type === 'compare' || step.type === 'swap') && active;
 
-        {/* Split line */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div
-            className="absolute top-16 bottom-20 w-1 bg-gradient-to-b from-orange-500/60 to-red-500/60 transition-all duration-500"
-            style={{
-              left: `${15 + (mid * 70) + 35}px`,
-              boxShadow: '0 0 20px rgba(249, 115, 22, 0.5)',
-            }}
-          />
-        </div>
+                let barColor = isLeftHalf
+                  ? 'bg-blue-400/30 border-blue-400/50'
+                  : 'bg-purple-400/30 border-purple-400/50';
 
-        <div className="relative z-10 flex items-end justify-center gap-3 h-full pt-16">
-          {array.map((value, idx) => {
-            const active = step.indices?.includes(idx);
-            const isLeftHalf = idx < mid;
-            const isMerging = step.type === 'compare' || step.type === 'swap';
+                if (isMerging) {
+                  barColor = 'bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.6)] border-orange-400';
+                }
 
-            let barColor = isLeftHalf
-              ? 'bg-gradient-to-t from-blue-500/50 to-blue-400/70'
-              : 'bg-gradient-to-t from-purple-500/50 to-purple-400/70';
-            let glow = '';
-            let effect = '';
+                return (
+                  <motion.div
+                    key={`${idx}-${value}`}
+                    layout
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="flex flex-col items-center justify-end flex-1 max-w-[60px] relative"
+                  >
+                    <motion.div
+                      layout
+                      className={`w-full rounded-xl transition-colors duration-500 border-2 ${barColor}`}
+                      style={{
+                        height: `${Math.max(20, (value / maxValue) * 280)}px`,
+                      }}
+                    />
+                    <motion.span layout className="mt-4 text-xs font-bold text-slate-500 dark:text-slate-400 font-mono">
+                      {value}
+                    </motion.span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
 
-            if (active && isMerging) {
-              barColor = 'bg-gradient-to-t from-orange-500/70 to-red-500/90';
-              glow = 'shadow-[0_0_25px_rgba(249,115,22,0.8)]';
-              effect = 'animate-pulse';
-            }
-
-            return (
-              <div
-                key={idx}
-                className="flex flex-col items-center justify-end flex-1 gap-2"
-              >
-                <div
-                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${active ? 'scale-105' : ''
-                    }`}
-                  style={{
-                    height: `${(value / maxValue) * 280}px`,
-                  }}
-                />
-                <span className="text-sm font-bold text-slate-300">
-                  {value}
-                </span>
-                <div className={`text-xs font-bold ${isLeftHalf ? 'text-blue-400' : 'text-purple-400'}`}>
-                  {isLeftHalf ? 'LEFT' : 'RIGHT'}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Legend */}
-        <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-          <div className="flex items-center justify-center gap-6 text-sm">
+          {/* Context Banner */}
+          <div className="mt-12 flex items-center gap-6 px-6 py-3 rounded-2xl glass-card border-slate-200/50 dark:border-slate-800/50">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500/60"></div>
-              <span className="text-slate-300">Left Half</span>
+              <div className="w-3 h-3 rounded-full bg-blue-400/50 shadow-sm" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Left Part</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-500/60"></div>
-              <span className="text-slate-300">Right Half</span>
+              <div className="w-3 h-3 rounded-full bg-purple-400/50 shadow-sm" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Right Part</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-orange-500/60 animate-pulse"></div>
-              <span className="text-slate-300">Merging</span>
+              <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Merging Status</span>
             </div>
           </div>
         </div>
@@ -397,101 +380,78 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
     const right = step.indices && step.indices.length > 2 ? step.indices[2] : -1;
 
     return (
-      <div className="relative h-full overflow-hidden">
-        {/* Quick sort background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-900/20 to-rose-950/40" />
-        <div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_50%,rgba(244,63,94,0.1),transparent,rgba(236,72,153,0.1))]" />
+      <div className="relative h-full flex items-center justify-center p-8 overflow-hidden">
+        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+          <div className="flex items-end justify-center gap-3 h-[320px] w-full px-4">
+            <AnimatePresence mode="popLayout">
+              {array.map((value, idx) => {
+                const isPivot = idx === pivot;
+                const isLeftPointer = idx === left;
+                const isRightPointer = idx === right;
+                const isActive = step.indices?.includes(idx);
 
-        {/* Pivot highlight */}
-        {pivot >= 0 && (
-          <div className="absolute inset-0 pointer-events-none">
-            <div
-              className="absolute top-16 w-16 h-16 border-4 border-pink-500/60 rounded-full transition-all duration-500 animate-spin"
-              style={{
-                left: `${15 + (pivot * 70) + 7}px`,
-                boxShadow: '0 0 30px rgba(244, 63, 94, 0.4)',
-              }}
-            />
+                let barColor = 'bg-slate-200 dark:bg-slate-800';
+                let label = null;
+
+                if (isPivot) {
+                  barColor = 'bg-pink-500 shadow-[0_0_20px_rgba(236,72,153,0.6)]';
+                  label = 'PIVOT';
+                } else if (isLeftPointer) {
+                  barColor = 'bg-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.5)]';
+                  label = 'LEFT';
+                } else if (isRightPointer) {
+                  barColor = 'bg-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.5)]';
+                  label = 'RIGHT';
+                } else if (isActive) {
+                  barColor = 'bg-blue-400/50';
+                }
+
+                return (
+                  <motion.div
+                    key={`${idx}-${value}`}
+                    layout
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="flex flex-col items-center justify-end flex-1 max-w-[60px] relative"
+                  >
+                    {label && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`absolute -top-10 text-[10px] font-black px-2 py-1 rounded shadow-sm bg-slate-900 text-white dark:bg-white dark:text-slate-950`}
+                      >
+                        {label}
+                      </motion.div>
+                    )}
+                    <motion.div
+                      layout
+                      className={`w-full rounded-xl transition-colors duration-500 border border-white/10 ${barColor}`}
+                      style={{
+                        height: `${Math.max(20, (value / maxValue) * 280)}px`,
+                      }}
+                    />
+                    <motion.span layout className="mt-4 text-xs font-bold text-slate-500 dark:text-slate-400 font-mono">
+                      {value}
+                    </motion.span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
-        )}
 
-        <div className="relative z-10 flex items-end justify-center gap-3 h-full pt-16">
-          {array.map((value, idx) => {
-            const isPivot = idx === pivot;
-            const isLeftPointer = idx === left;
-            const isRightPointer = idx === right;
-            const isActive = step.indices?.includes(idx);
-
-            let barColor = 'bg-gradient-to-t from-slate-500/40 to-slate-400/60';
-            let glow = '';
-            let effect = '';
-            let label = '';
-
-            if (isPivot) {
-              barColor = 'bg-gradient-to-t from-pink-500/70 to-rose-500/90';
-              glow = 'shadow-[0_0_30px_rgba(244,63,94,0.9)]';
-              effect = 'animate-pulse';
-              label = 'PIVOT';
-            } else if (isLeftPointer) {
-              barColor = 'bg-gradient-to-t from-blue-500/70 to-cyan-500/90';
-              glow = 'shadow-[0_0_25px_rgba(6,182,212,0.8)]';
-              effect = 'animate-bounce';
-              label = 'LEFT';
-            } else if (isRightPointer) {
-              barColor = 'bg-gradient-to-t from-purple-500/70 to-indigo-500/90';
-              glow = 'shadow-[0_0_25px_rgba(139,92,246,0.8)]';
-              effect = 'animate-bounce';
-              label = 'RIGHT';
-            } else if (isActive) {
-              barColor = 'bg-gradient-to-t from-emerald-500/50 to-teal-400/70';
-              glow = 'shadow-[0_0_20px_rgba(16,185,129,0.7)]';
-            }
-
-            return (
-              <div
-                key={idx}
-                className="flex flex-col items-center justify-end flex-1 gap-2"
-              >
-                <div
-                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${isActive ? 'scale-105' : ''
-                    }`}
-                  style={{
-                    height: `${(value / maxValue) * 280}px`,
-                  }}
-                />
-                <span className="text-sm font-bold text-slate-300">
-                  {value}
-                </span>
-                {label && (
-                  <div className={`text-xs font-bold animate-pulse ${isPivot ? 'text-pink-400' :
-                    isLeftPointer ? 'text-blue-400' : 'text-purple-400'
-                    }`}>
-                    {label}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Legend */}
-        <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-          <div className="flex items-center justify-center gap-6 text-sm">
+          {/* Context Banner */}
+          <div className="mt-12 flex items-center gap-6 px-6 py-3 rounded-2xl glass-card border-slate-200/50 dark:border-slate-800/50">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-slate-500/60"></div>
-              <span className="text-slate-300">Unsorted</span>
+              <div className="w-3 h-3 rounded-full bg-pink-500" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Pivot</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-pink-500/60 animate-pulse"></div>
-              <span className="text-slate-300">Pivot</span>
+              <div className="w-3 h-3 rounded-full bg-cyan-500" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">L-Ptr</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500/60 animate-bounce"></div>
-              <span className="text-slate-300">Left Pointer</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-500/60 animate-bounce"></div>
-              <span className="text-slate-300">Right Pointer</span>
+              <div className="w-3 h-3 rounded-full bg-purple-500" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">R-Ptr</span>
             </div>
           </div>
         </div>
