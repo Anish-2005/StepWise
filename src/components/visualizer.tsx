@@ -1,5 +1,6 @@
 'use client';
 
+import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { Step } from '@/types';
 
@@ -60,65 +61,91 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
   function renderBubbleSortVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-50">
-        <div className="relative w-full max-w-4xl">
-          <div className="flex items-end justify-center gap-2 h-80">
-            {step.arrayState!.map((value, idx) => {
-              const active = step.indices?.includes(idx);
-              const isComparing = active && step.type === 'compare';
-              const isSwapping = active && step.type === 'swap';
+      <div className="relative h-full flex items-center justify-center p-8 overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[300px] bg-blue-500/5 blur-[100px] rounded-full" />
+        </div>
 
-              let barColor = 'bg-slate-300';
-              let borderColor = 'border-slate-400';
-              let scale = 1;
+        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+          <div className="flex items-end justify-center gap-2 sm:gap-4 h-[320px] w-full px-4">
+            <AnimatePresence mode="popLayout">
+              {step.arrayState!.map((value, idx) => {
+                const active = step.indices?.includes(idx);
+                const isComparing = active && step.type === 'compare';
+                const isSwapping = active && step.type === 'swap';
 
-              if (isSwapping) {
-                barColor = 'bg-red-500';
-                borderColor = 'border-red-400';
-                scale = 1.05;
-              } else if (isComparing) {
-                barColor = 'bg-yellow-500';
-                borderColor = 'border-yellow-400';
-              }
+                let barColor = 'bg-slate-200 dark:bg-slate-800';
+                let glow = '';
 
-              return (
-                <div
-                  key={idx}
-                  className="flex flex-col items-center justify-end flex-1 gap-1"
-                >
-                  <div
-                    className={`w-8 border-2 rounded-t transition-all duration-300 ${barColor} ${borderColor} ${
-                      scale !== 1 ? 'transform scale-105' : ''
-                    }`}
-                    style={{
-                      height: `${(value / maxValue) * 240}px`,
+                if (isSwapping) {
+                  barColor = 'bg-rose-500 shadow-[0_0_25px_rgba(244,63,94,0.6)]';
+                } else if (isComparing) {
+                  barColor = 'bg-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.5)]';
+                }
+
+                return (
+                  <motion.div
+                    key={`${idx}-${value}`} // Use index and value for better tracking
+                    layout
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 30,
                     }}
-                  />
-                  <span className="text-xs font-medium text-slate-600">
-                    {value}
-                  </span>
-                </div>
-              );
-            })}
+                    className="flex flex-col items-center justify-end flex-1 max-w-[60px]"
+                  >
+                    <motion.div
+                      layout
+                      className={`w-full rounded-xl transition-colors duration-500 border border-white/10 ${barColor}`}
+                      style={{
+                        height: `${Math.max(20, (value / maxValue) * 280)}px`,
+                      }}
+                    >
+                      {active && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-slate-900 text-white text-[10px] font-bold"
+                        >
+                          {step.type.toUpperCase()}
+                        </motion.div>
+                      )}
+                    </motion.div>
+                    <motion.span
+                      layout
+                      className="mt-4 text-sm font-bold text-slate-500 dark:text-slate-400 font-mono"
+                    >
+                      {value}
+                    </motion.span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
 
-          {/* Legend */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200 shadow-sm">
-            <div className="flex items-center justify-center gap-8 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-slate-300 border border-slate-400 rounded"></div>
-                <span className="text-slate-700 font-medium">Unsorted</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-yellow-500 border border-yellow-400 rounded"></div>
-                <span className="text-slate-700 font-medium">Comparing</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 border border-red-400 rounded"></div>
-                <span className="text-slate-700 font-medium">Swapping</span>
-              </div>
+          {/* Context Banner */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="mt-12 flex items-center gap-8 px-6 py-3 rounded-2xl glass-card border-slate-200/50 dark:border-slate-800/50"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-700" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Base</span>
             </div>
-          </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Comparing</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Swapping</span>
+            </div>
+          </motion.div>
         </div>
       </div>
     );
@@ -126,73 +153,75 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
   function renderSelectionSortVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full flex items-center justify-center bg-slate-50">
-        <div className="relative w-full max-w-4xl">
-          <div className="flex items-end justify-center gap-2 h-80">
-            {step.arrayState!.map((value, idx) => {
-              const active = step.indices?.includes(idx);
-              const isMin = step.indices && step.indices.length >= 2 && idx === step.indices[1];
-              const isCurrent = step.indices && step.indices.length >= 1 && idx === step.indices[0];
+      <div className="relative h-full flex items-center justify-center p-8 overflow-hidden">
+        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+          <div className="flex items-end justify-center gap-3 h-[320px] w-full px-4">
+            <AnimatePresence mode="popLayout">
+              {step.arrayState!.map((value, idx) => {
+                const active = step.indices?.includes(idx);
+                const isMin = step.indices && step.indices.length >= 2 && idx === step.indices[1];
+                const isCurrent = step.indices && step.indices.length >= 1 && idx === step.indices[0];
 
-              let barColor = 'bg-slate-300';
-              let borderColor = 'border-slate-400';
-              let scale = 1;
+                let barColor = 'bg-slate-200 dark:bg-slate-800';
+                let label = null;
 
-              if (isMin) {
-                barColor = 'bg-green-500';
-                borderColor = 'border-green-400';
-                scale = 1.05;
-              } else if (isCurrent) {
-                barColor = 'bg-purple-500';
-                borderColor = 'border-purple-400';
-                scale = 1.05;
-              } else if (active) {
-                barColor = 'bg-blue-500';
-                borderColor = 'border-blue-400';
-              }
+                if (isMin) {
+                  barColor = 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)]';
+                  label = 'MIN';
+                } else if (isCurrent) {
+                  barColor = 'bg-purple-600 shadow-[0_0_20px_rgba(139,92,246,0.5)]';
+                  label = 'PTR';
+                } else if (active) {
+                  barColor = 'bg-blue-400/50';
+                }
 
-              return (
-                <div
-                  key={idx}
-                  className="flex flex-col items-center justify-end flex-1 gap-1"
-                >
-                  <div
-                    className={`w-8 border-2 rounded-t transition-all duration-300 ${barColor} ${borderColor} ${
-                      scale !== 1 ? 'transform scale-105' : ''
-                    }`}
-                    style={{
-                      height: `${(value / maxValue) * 240}px`,
-                    }}
-                  />
-                  <span className="text-xs font-medium text-slate-600">
-                    {value}
-                  </span>
-                  {isMin && (
-                    <div className="text-xs text-green-600 font-semibold">MIN</div>
-                  )}
-                  {isCurrent && (
-                    <div className="text-xs text-purple-600 font-semibold">CURRENT</div>
-                  )}
-                </div>
-              );
-            })}
+                return (
+                  <motion.div
+                    key={`${idx}-${value}`}
+                    layout
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="flex flex-col items-center justify-end flex-1 max-w-[60px] relative"
+                  >
+                    {label && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`absolute -top-10 text-[10px] font-black px-2 py-1 rounded shadow-sm ${isMin ? 'bg-emerald-500 text-white' : 'bg-purple-600 text-white'
+                          }`}
+                      >
+                        {label}
+                      </motion.div>
+                    )}
+                    <motion.div
+                      layout
+                      className={`w-full rounded-xl transition-colors duration-500 border border-white/5 dark:border-white/10 ${barColor}`}
+                      style={{
+                        height: `${Math.max(20, (value / maxValue) * 280)}px`,
+                      }}
+                    />
+                    <motion.span layout className="mt-4 text-sm font-bold text-slate-500 dark:text-slate-400 font-mono">
+                      {value}
+                    </motion.span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
 
-          {/* Legend */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-slate-200 shadow-sm">
-            <div className="flex items-center justify-center gap-8 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-slate-300 border border-slate-400 rounded"></div>
-                <span className="text-slate-700 font-medium">Unsorted</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-purple-500 border border-purple-400 rounded"></div>
-                <span className="text-slate-700 font-medium">Current</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 border border-green-400 rounded"></div>
-                <span className="text-slate-700 font-medium">Minimum</span>
-              </div>
+          {/* Context Banner */}
+          <div className="mt-12 flex items-center gap-6 px-6 py-3 rounded-2xl glass-card border-slate-200/50 dark:border-slate-800/50">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-700" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Unsorted</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-purple-600 shadow-[0_0_10px_rgba(139,92,246,0.5)]" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Pointer</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Minimum</span>
             </div>
           </div>
         </div>
@@ -202,82 +231,75 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
 
   function renderInsertionSortVisualization(step: Step, maxValue: number) {
     return (
-      <div className="relative h-full overflow-hidden bg-slate-50">
-        {/* Subtle pattern background */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5 5-2.24 5-5zm5 0c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5 5-2.24 5-5z'/%3E%3C/g%3E%3C/svg%3E")`,
-          }} />
-        </div>
+      <div className="relative h-full overflow-hidden p-8">
+        <div className="relative z-10 w-full max-w-5xl flex flex-col items-center">
+          <div className="flex items-end justify-center gap-3 h-[320px] w-full px-4">
+            <AnimatePresence mode="popLayout">
+              {step.arrayState!.map((value, idx) => {
+                const active = step.indices?.includes(idx);
+                const isInserting = active && step.type === 'compare';
+                const isShifting = active && step.type === 'swap';
 
-        <div className="relative z-10 flex items-end justify-center gap-3 h-full pt-16">
-          {step.arrayState!.map((value, idx) => {
-            const active = step.indices?.includes(idx);
-            const isInserting = active && step.type === 'compare';
-            const isShifting = active && step.type === 'swap';
+                let barColor = 'bg-slate-200 dark:bg-slate-800';
+                let label = null;
 
-            let barColor = 'bg-gradient-to-t from-slate-300 to-slate-200';
-            let glow = '';
-            let effect = '';
-            let arrow = null;
+                if (isInserting) {
+                  barColor = 'bg-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.5)]';
+                  label = 'INS';
+                } else if (isShifting) {
+                  barColor = 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.5)]';
+                  label = 'SHIFT';
+                } else if (active) {
+                  barColor = 'bg-blue-400/50';
+                }
 
-            if (isInserting) {
-              barColor = 'bg-gradient-to-t from-cyan-400 to-cyan-300';
-              glow = 'shadow-lg shadow-cyan-500/30';
-              effect = 'animate-pulse';
-              arrow = '↓';
-            } else if (isShifting) {
-              barColor = 'bg-gradient-to-t from-green-400 to-green-300';
-              glow = 'shadow-lg shadow-green-500/30';
-              effect = 'animate-bounce';
-              arrow = '→';
-            } else if (active) {
-              barColor = 'bg-gradient-to-t from-blue-400 to-blue-300';
-              glow = 'shadow-lg shadow-blue-500/30';
-            }
+                return (
+                  <motion.div
+                    key={`${idx}-${value}`}
+                    layout
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="flex flex-col items-center justify-end flex-1 max-w-[60px] relative"
+                  >
+                    {label && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`absolute -top-10 text-[10px] font-black px-2 py-1 rounded shadow-sm ${isInserting ? 'bg-cyan-500 text-white' : 'bg-emerald-500 text-white'
+                          }`}
+                      >
+                        {label}
+                      </motion.div>
+                    )}
+                    <motion.div
+                      layout
+                      className={`w-full rounded-xl transition-colors duration-500 border border-white/5 dark:border-white/10 ${barColor}`}
+                      style={{
+                        height: `${Math.max(20, (value / maxValue) * 280)}px`,
+                      }}
+                    />
+                    <motion.span layout className="mt-4 text-sm font-bold text-slate-500 dark:text-slate-400 font-mono">
+                      {value}
+                    </motion.span>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
 
-            return (
-              <div
-                key={idx}
-                className="flex flex-col items-center justify-end flex-1 gap-2"
-              >
-                {arrow && (
-                  <div className={`text-2xl font-bold transition-all duration-300 ${
-                    isInserting ? 'text-cyan-600 animate-bounce' : 'text-green-600 animate-pulse'
-                  }`}>
-                    {arrow}
-                  </div>
-                )}
-                <div
-                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} border border-white/50 ${
-                    active ? 'scale-105' : ''
-                  }`}
-                  style={{
-                    height: `${(value / maxValue) * 280}px`,
-                  }}
-                />
-                <span className="text-sm font-bold text-slate-700">
-                  {value}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Legend */}
-        <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-center gap-6 text-sm">
+          {/* Context Banner */}
+          <div className="mt-12 flex items-center gap-6 px-6 py-3 rounded-2xl glass-card border-slate-200/50 dark:border-slate-800/50">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-              <span className="text-slate-700 font-medium">Sorted</span>
+              <div className="w-3 h-3 rounded-full bg-slate-300 dark:bg-slate-700" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Base</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse"></div>
-              <span className="text-slate-700 font-medium">Inserting</span>
+              <div className="w-3 h-3 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Inserting</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-400 animate-bounce"></div>
-              <span className="text-slate-700 font-medium">Shifting</span>
+              <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Shifting</span>
             </div>
           </div>
         </div>
@@ -330,9 +352,8 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                 className="flex flex-col items-center justify-end flex-1 gap-2"
               >
                 <div
-                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${
-                    active ? 'scale-105' : ''
-                  }`}
+                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${active ? 'scale-105' : ''
+                    }`}
                   style={{
                     height: `${(value / maxValue) * 280}px`,
                   }}
@@ -432,9 +453,8 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                 className="flex flex-col items-center justify-end flex-1 gap-2"
               >
                 <div
-                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${
-                    isActive ? 'scale-105' : ''
-                  }`}
+                  className={`w-14 rounded-t-2xl transition-all duration-500 ease-out ${barColor} ${glow} ${effect} ${isActive ? 'scale-105' : ''
+                    }`}
                   style={{
                     height: `${(value / maxValue) * 280}px`,
                   }}
@@ -443,10 +463,9 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                   {value}
                 </span>
                 {label && (
-                  <div className={`text-xs font-bold animate-pulse ${
-                    isPivot ? 'text-pink-400' :
+                  <div className={`text-xs font-bold animate-pulse ${isPivot ? 'text-pink-400' :
                     isLeftPointer ? 'text-blue-400' : 'text-purple-400'
-                  }`}>
+                    }`}>
                     {label}
                   </div>
                 )}
@@ -520,9 +539,8 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                 className="flex flex-col items-center justify-end flex-1 gap-2"
               >
                 <div
-                  className={`w-12 rounded-t-xl transition-all duration-300 ease-out ${barColor} ${glow} border border-white/50 ${
-                    active ? 'scale-105' : ''
-                  }`}
+                  className={`w-12 rounded-t-xl transition-all duration-300 ease-out ${barColor} ${glow} border border-white/50 ${active ? 'scale-105' : ''
+                    }`}
                   style={{
                     height: `${(value / maxValue) * 350}px`,
                   }}
@@ -721,9 +739,8 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                   className="flex flex-col items-center justify-end gap-1"
                 >
                   <div
-                    className={`w-8 rounded-t transition-all duration-300 ${barColor} ${glow} ${
-                      isActive ? 'scale-110' : ''
-                    }`}
+                    className={`w-8 rounded-t transition-all duration-300 ${barColor} ${glow} ${isActive ? 'scale-110' : ''
+                      }`}
                     style={{
                       height: `${(value / maxValue) * 60}px`,
                     }}
@@ -880,11 +897,10 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                 {extra.queue.map((nodeIdx: number, queueIdx: number) => (
                   <div
                     key={nodeIdx}
-                    className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${
-                      queueIdx === 0
-                        ? 'bg-cyan-500 text-white border-cyan-400'
-                        : 'bg-slate-200 text-slate-700 border-slate-300'
-                    }`}
+                    className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${queueIdx === 0
+                      ? 'bg-cyan-500 text-white border-cyan-400'
+                      : 'bg-slate-200 text-slate-700 border-slate-300'
+                      }`}
                   >
                     {nodeIdx}
                   </div>
@@ -1017,11 +1033,10 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                 {[...extra.stack].reverse().map((nodeIdx: number, stackIdx: number) => (
                   <div
                     key={nodeIdx}
-                    className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${
-                      stackIdx === 0
-                        ? 'bg-purple-300/80 text-slate-700 border-purple-400'
-                        : 'bg-slate-300/50 text-slate-700 border-slate-400'
-                    }`}
+                    className={`w-6 h-6 rounded border flex items-center justify-center text-xs font-medium ${stackIdx === 0
+                      ? 'bg-purple-300/80 text-slate-700 border-purple-400'
+                      : 'bg-slate-300/50 text-slate-700 border-slate-400'
+                      }`}
                   >
                     {nodeIdx}
                   </div>
@@ -1367,7 +1382,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
             {extra.visited.map((visited: boolean, idx: number) => {
               const pos = getNodePosition(idx);
               const isCurrent = step.nodes?.[0] === String(idx) ||
-                               (extra.path && extra.path.includes(idx));
+                (extra.path && extra.path.includes(idx));
               const isInQueue = extra.queue?.includes(idx);
               const isInStack = extra.stack?.includes(idx);
               const isInOpenSet = extra.openSet?.includes(idx);
@@ -1407,7 +1422,7 @@ export default function Visualizer({ steps, currentStep, algorithm }: Visualizer
                       className="text-xs font-medium fill-slate-600"
                     >
                       {distance !== undefined ? `d:${distance === Infinity ? '∞' : distance}` :
-                       gScore !== undefined ? `g:${gScore === Infinity ? '∞' : gScore}` : ''}
+                        gScore !== undefined ? `g:${gScore === Infinity ? '∞' : gScore}` : ''}
                     </text>
                   )}
                   {fScore !== undefined && (
