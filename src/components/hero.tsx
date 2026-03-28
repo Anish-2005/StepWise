@@ -121,11 +121,14 @@ export default function Hero({ onGetStarted }: HeroProps) {
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
             </button>
 
-            <button className="flex items-center gap-3 text-slate-600 dark:text-slate-400 font-bold hover:text-slate-900 dark:hover:text-white transition-colors group">
+            <button
+              onClick={onGetStarted}
+              className="flex items-center gap-3 text-slate-600 dark:text-slate-400 font-bold hover:text-slate-900 dark:hover:text-white transition-colors group"
+            >
               <div className="w-12 h-12 rounded-xl glass-panel flex items-center justify-center group-hover:bg-slate-100 dark:group-hover:bg-slate-800 transition-colors">
                 <Database className="w-5 h-5" />
               </div>
-              <span className="uppercase tracking-widest text-sm">View Patterns</span>
+              <span className="uppercase tracking-widest text-sm">Explore Workspace</span>
             </button>
           </motion.div>
 
@@ -139,7 +142,8 @@ export default function Hero({ onGetStarted }: HeroProps) {
                 <div key={i} className="w-12 h-12 rounded-full border-4 border-slate-50 dark:border-[#020617] bg-slate-200 dark:bg-slate-800 overflow-hidden shadow-xl hover:translate-y-[-4px] transition-transform cursor-pointer">
                   <Image
                     src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i * 23}`}
-                    alt="User"
+                    alt=""
+                    aria-hidden
                     width={48}
                     height={48}
                   />
@@ -150,7 +154,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
               </div>
             </div>
             <p className="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">
-              Trusted by Engineers at <span className="text-blue-500">Google</span> • <span className="text-purple-500">Meta</span> • <span className="text-emerald-500">Vercel</span>
+              Trusted by developers worldwide for interview prep and CS learning
             </p>
           </motion.div>
         </motion.div>

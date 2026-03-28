@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Github, Cpu, Box, Command } from 'lucide-react';
@@ -10,6 +10,18 @@ interface HeaderProps {
   className?: string;
 }
 
+const NAV_LINKS = [
+  { label: 'Algorithms', href: '#algorithm-workspace' },
+  { label: 'Telemetry', href: '#telemetry' },
+  { label: 'Overview', href: '#about' },
+] as const;
+
+const MOBILE_LINKS = [
+  { label: 'Algorithms Explorer', href: '#algorithm-workspace', icon: <Box size={18} /> },
+  { label: 'Runtime Telemetry', href: '#telemetry', icon: <Command size={18} /> },
+  { label: 'Platform Overview', href: '#about', icon: <Cpu size={18} /> },
+] as const;
+
 export default function Header({ className = '' }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,6 +31,8 @@ export default function Header({ className = '' }: HeaderProps) {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <header
@@ -33,17 +47,16 @@ export default function Header({ className = '' }: HeaderProps) {
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <div className="flex items-center justify-between">
-
-          {/* ================= IDENTITY ================= */}
           <Link
             href="/"
             className="flex items-center gap-4 group transition-transform hover:scale-[1.02]"
+            aria-label="StepWise home"
           >
             <div className="relative">
               <Logo size="sm" showText={false} />
               <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
                 className="absolute inset-0 border border-blue-500/20 rounded-lg scale-150"
               />
             </div>
@@ -57,19 +70,17 @@ export default function Header({ className = '' }: HeaderProps) {
             </div>
           </Link>
 
-          {/* ================= DESKTOP NAV ================= */}
           <nav className="hidden md:flex items-center gap-1 bg-slate-100/50 dark:bg-slate-900/50 p-1 rounded-2xl border border-slate-200/50 dark:border-slate-800/50">
-            <ModeLink label="Algorithms" href="#algorithm-controls" />
-            <ModeLink label="Execution" href="#algorithm-controls" />
-            <ModeLink label="Documentation" href="#about" />
+            {NAV_LINKS.map((link) => (
+              <ModeLink key={link.href} label={link.label} href={link.href} />
+            ))}
           </nav>
 
-          {/* ================= ACTIONS ================= */}
           <div className="hidden sm:flex items-center gap-4">
             <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/50">
               <div className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </div>
               <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest">
                 Runtime Ready
@@ -82,15 +93,18 @@ export default function Header({ className = '' }: HeaderProps) {
               href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Open GitHub"
               className="p-2.5 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
             >
               <Github className="w-5 h-5" />
             </a>
           </div>
 
-          {/* ================= MOBILE TOGGLE ================= */}
           <button
-            onClick={() => setMenuOpen((v) => !v)}
+            onClick={() => setMenuOpen((value) => !value)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
           >
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -98,19 +112,25 @@ export default function Header({ className = '' }: HeaderProps) {
         </div>
       </div>
 
-      {/* ================= MOBILE NAV ================= */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            id="mobile-nav"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             className="md:hidden overflow-hidden bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-900 shadow-2xl"
           >
             <div className="p-6 space-y-4">
-              <MobileLink label="Algorithms Explorer" href="#algorithm-controls" icon={<Box size={18} />} />
-              <MobileLink label="System Settings" href="#algorithm-controls" icon={<Command size={18} />} />
-              <MobileLink label="Technical Docs" href="#about" icon={<Cpu size={18} />} />
+              {MOBILE_LINKS.map((link) => (
+                <MobileLink
+                  key={link.href}
+                  label={link.label}
+                  href={link.href}
+                  icon={link.icon}
+                  onClick={closeMenu}
+                />
+              ))}
 
               <div className="pt-6 mt-6 border-t border-slate-100 dark:border-slate-900">
                 <a
@@ -142,16 +162,26 @@ function ModeLink({ label, href }: { label: string; href: string }) {
   );
 }
 
-function MobileLink({ label, href, icon }: { label: string; href: string; icon: React.ReactNode }) {
+function MobileLink({
+  label,
+  href,
+  icon,
+  onClick,
+}: {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+}) {
   return (
     <a
       href={href}
+      onClick={onClick}
       className="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 font-bold transition-all border border-transparent hover:border-slate-100 dark:hover:border-slate-800"
     >
-      <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
-        {icon}
-      </div>
+      <div className="p-2 bg-slate-100 dark:bg-slate-800 rounded-lg">{icon}</div>
       {label}
     </a>
   );
 }
+

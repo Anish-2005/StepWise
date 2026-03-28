@@ -1,7 +1,8 @@
-'use client';
+﻿'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shuffle, Zap, Terminal, Settings2 } from 'lucide-react';
+import { KeyboardEvent } from 'react';
 import { AlgorithmType } from '@/types';
 
 interface ControlPanelProps {
@@ -11,9 +12,90 @@ interface ControlPanelProps {
   setAlgorithm: (algo: AlgorithmType) => void;
   input: string;
   setInput: (input: string) => void;
-  onGenerate: () => void;
+  onGenerate: () => void | Promise<void>;
   onRandom: () => void;
   isLoading?: boolean;
+}
+
+const CATEGORY_OPTIONS = [
+  { value: 'sorting', label: 'Sorting Algorithms' },
+  { value: 'graph', label: 'Graph Traversal' },
+  { value: 'heap', label: 'Heap Operations' },
+] as const;
+
+const ALGORITHM_OPTIONS: Record<string, Array<{ value: AlgorithmType; label: string }>> = {
+  sorting: [
+    { value: 'bubble', label: 'Bubble Sort' },
+    { value: 'selection', label: 'Selection Sort' },
+    { value: 'insertion', label: 'Insertion Sort' },
+    { value: 'merge', label: 'Merge Sort' },
+    { value: 'quick', label: 'Quick Sort' },
+  ],
+  graph: [
+    { value: 'bfs', label: 'BFS' },
+    { value: 'dfs', label: 'DFS' },
+    { value: 'dijkstra', label: 'Dijkstra' },
+    { value: 'astar', label: 'A* Search' },
+  ],
+  heap: [
+    { value: 'buildHeap', label: 'Build Heap' },
+    { value: 'insertHeap', label: 'Insert' },
+    { value: 'extractMax', label: 'Extract Max' },
+    { value: 'heapSort', label: 'Heap Sort' },
+    { value: 'decreaseKey', label: 'Decrease Key' },
+    { value: 'deleteHeap', label: 'Delete' },
+  ],
+};
+
+function getInputGuide(category: ControlPanelProps['category'], algorithm: AlgorithmType) {
+  if (category === 'sorting') {
+    return {
+      label: 'Comma-separated numeric values',
+      placeholder: '64,34,25,12,22,11,90',
+      hint: 'Example: 10,3,99,42,7',
+    };
+  }
+
+  if (category === 'graph') {
+    return {
+      label: 'Adjacency format',
+      placeholder: '0:1,2;1:0,2;2:0,1',
+      hint:
+        algorithm === 'dijkstra' || algorithm === 'astar'
+          ? 'Weighted example: 0:1-4,2-2;1:0-4,2-1;2:0-2,1-1'
+          : 'Unweighted example: 0:1,2;1:0,2;2:0,1',
+    };
+  }
+
+  if (algorithm === 'insertHeap') {
+    return {
+      label: 'Insert format',
+      placeholder: '40,50,30,20,10',
+      hint: 'value,heapNode1,heapNode2,...',
+    };
+  }
+
+  if (algorithm === 'decreaseKey') {
+    return {
+      label: 'Decrease key format',
+      placeholder: '2,10,90,70,60,40',
+      hint: 'index,newValue,heapNode1,heapNode2,...',
+    };
+  }
+
+  if (algorithm === 'deleteHeap') {
+    return {
+      label: 'Delete format',
+      placeholder: '1,90,70,60,40',
+      hint: 'index,heapNode1,heapNode2,...',
+    };
+  }
+
+  return {
+    label: 'Heap values',
+    placeholder: '64,34,25,12,22,11,90',
+    hint: 'Comma-separated heap nodes',
+  };
 }
 
 export default function ControlPanel({
@@ -27,44 +109,18 @@ export default function ControlPanel({
   onRandom,
   isLoading = false,
 }: ControlPanelProps) {
-  const getCategoryOptions = () => {
-    return [
-      { value: 'sorting', label: 'Sorting Algorithms' },
-      { value: 'graph', label: 'Graph Traversal' },
-      { value: 'heap', label: 'Heap Operations' },
-    ];
-  };
+  const algorithmOptions = ALGORITHM_OPTIONS[category] || [];
+  const inputGuide = getInputGuide(category, algorithm);
 
-  const getAlgorithmOptions = () => {
-    const options: Record<string, Array<{ value: string; label: string }>> = {
-      sorting: [
-        { value: 'bubble', label: 'Bubble Sort' },
-        { value: 'selection', label: 'Selection Sort' },
-        { value: 'insertion', label: 'Insertion Sort' },
-        { value: 'merge', label: 'Merge Sort' },
-        { value: 'quick', label: 'Quick Sort' },
-      ],
-      graph: [
-        { value: 'bfs', label: 'BFS' },
-        { value: 'dfs', label: 'DFS' },
-        { value: 'dijkstra', label: 'Dijkstra' },
-        { value: 'astar', label: 'A* Search' },
-      ],
-      heap: [
-        { value: 'buildHeap', label: 'Build Heap' },
-        { value: 'insertHeap', label: 'Insert' },
-        { value: 'extractMax', label: 'Extract Max' },
-        { value: 'heapSort', label: 'Heap Sort' },
-        { value: 'decreaseKey', label: 'Decrease Key' },
-        { value: 'deleteHeap', label: 'Delete' },
-      ],
-    };
-    return options[category] || [];
+  const handleInputKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      event.preventDefault();
+      void onGenerate();
+    }
   };
 
   return (
     <div className="sticky top-28 space-y-12">
-      {/* ================= CATEGORY ================= */}
       <section className="space-y-6">
         <header className="space-y-2">
           <div className="flex items-center gap-3">
@@ -80,15 +136,17 @@ export default function ControlPanel({
           </p>
         </header>
 
-        <div className="flex flex-col gap-2">
-          {getCategoryOptions().map((opt) => {
-            const active = category === opt.value;
+        <div className="flex flex-col gap-2" role="radiogroup" aria-label="Algorithm category">
+          {CATEGORY_OPTIONS.map((option) => {
+            const active = category === option.value;
             return (
               <motion.button
-                key={opt.value}
+                key={option.value}
                 whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setCategory(opt.value as 'sorting' | 'graph' | 'heap')}
+                onClick={() => setCategory(option.value)}
+                aria-pressed={active}
+                disabled={isLoading}
                 className={`
                   relative w-full px-5 py-3 rounded-2xl text-sm font-bold text-left
                   transition-all duration-300 overflow-hidden
@@ -96,6 +154,7 @@ export default function ControlPanel({
                     ? 'text-white shadow-lg'
                     : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-blue-400/50'
                   }
+                  ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}
                 `}
               >
                 {active && (
@@ -104,14 +163,13 @@ export default function ControlPanel({
                     className="absolute inset-0 premium-gradient -z-10"
                   />
                 )}
-                {opt.label}
+                {option.label}
               </motion.button>
             );
           })}
         </div>
       </section>
 
-      {/* ================= ALGORITHM ================= */}
       <section className="space-y-6">
         <header className="space-y-2">
           <div className="flex items-center gap-3">
@@ -127,19 +185,21 @@ export default function ControlPanel({
           </p>
         </header>
 
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-2" role="radiogroup" aria-label="Algorithm">
           <AnimatePresence mode="popLayout">
-            {getAlgorithmOptions().map((opt) => {
-              const active = algorithm === opt.value;
+            {algorithmOptions.map((option) => {
+              const active = algorithm === option.value;
               return (
                 <motion.button
-                  key={opt.value}
+                  key={option.value}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   whileHover={{ x: 4 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setAlgorithm(opt.value as AlgorithmType)}
+                  onClick={() => setAlgorithm(option.value)}
+                  aria-pressed={active}
+                  disabled={isLoading}
                   className={`
                     relative px-5 py-2.5 rounded-xl text-xs font-bold text-left
                     transition-all duration-300
@@ -147,9 +207,10 @@ export default function ControlPanel({
                       ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-500/20'
                       : 'bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-white'
                     }
+                    ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}
                   `}
                 >
-                  {opt.label}
+                  {option.label}
                 </motion.button>
               );
             })}
@@ -157,7 +218,6 @@ export default function ControlPanel({
         </div>
       </section>
 
-      {/* ================= INPUT ================= */}
       <section className="space-y-6">
         <header className="space-y-2">
           <div className="flex items-center gap-3">
@@ -169,29 +229,36 @@ export default function ControlPanel({
             </span>
           </div>
           <p className="text-xs text-slate-500 font-medium">
-            Input values manualy or generate random seed.
+            {inputGuide.label}
           </p>
         </header>
 
         <div className="space-y-4">
+          <label htmlFor="algorithm-input" className="sr-only">
+            Algorithm input
+          </label>
           <textarea
+            id="algorithm-input"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={handleInputKeyDown}
             rows={3}
+            placeholder={inputGuide.placeholder}
             className="
               w-full p-4 rounded-2xl text-xs font-mono
-              bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 
+              bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800
               text-slate-800 dark:text-slate-200
-              placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 
+              placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10
               focus:border-blue-500/50 transition-all resize-none shadow-inner
             "
           />
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{inputGuide.hint}</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={onGenerate}
+              onClick={() => void onGenerate()}
               disabled={isLoading}
               className="
                 h-11 rounded-xl premium-gradient text-white text-xs font-bold
@@ -208,7 +275,7 @@ export default function ControlPanel({
               onClick={onRandom}
               disabled={isLoading}
               className="
-                h-11 rounded-xl bg-white dark:bg-slate-900 border 
+                h-11 rounded-xl bg-white dark:bg-slate-900 border
                 border-slate-200 dark:border-slate-800
                 text-slate-700 dark:text-slate-300 text-xs font-bold
                 hover:shadow-sm transition-all
@@ -223,7 +290,6 @@ export default function ControlPanel({
         </div>
       </section>
 
-      {/* ================= LEGEND ================= */}
       <section className="bg-slate-100/50 dark:bg-slate-900/50 rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
         <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-4">
           Color Indicators
@@ -245,3 +311,4 @@ export default function ControlPanel({
     </div>
   );
 }
+
